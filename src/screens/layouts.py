@@ -64,6 +64,46 @@ MDScreenManager:
 
 <HomeScreen>:
     name: "home_screen"
+    MDBottomNavigation:
+        MDBottomNavigationItem:
+            name: 'inicio'
+            text: 'Início'
+            icon: 'music-circle'
+            MDLabel:
+                text: "Minhas músicas"
+                halign: "center"
+
+        MDBottomNavigationItem:
+            name: 'buscar'
+            text: 'Buscar'
+            icon: 'magnify'
+            MDLabel:
+                text: "Buscar"
+                halign: "center"
+
+        MDBottomNavigationItem:
+            name: 'eventos'
+            text: 'Eventos'
+            icon: 'account-group'
+            MDLabel:
+                text: "Eventos"
+                halign: "center"
+
+        MDBottomNavigationItem:
+            name: 'conexoes'
+            text: 'Conexões'
+            icon: 'account-group'
+            MDLabel:
+                text: "Conexões"
+                halign: "center"
+
+        MDBottomNavigationItem:
+            name: 'perfil'
+            text: 'Perfil'
+            icon: 'account'
+            MDLabel:
+                text: "Perfil"
+                halign: "center"
 
 <SignUpScreen>:
     name: "sign_up_screen"
