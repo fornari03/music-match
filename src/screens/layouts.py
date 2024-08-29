@@ -1,4 +1,7 @@
 KV = '''
+#: import WipeTransition kivy.uix.screenmanager.WipeTransition
+
+
 MDScreenManager:
     LoginScreen:
     HomeScreen:
@@ -54,7 +57,9 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
-            on_release: root.login()
+            on_release: 
+                root.manager.transition = WipeTransition()
+                root.login()
         MDTextButton:
             text: "Sign Up"
             theme_text_color: "Custom"
