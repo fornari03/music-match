@@ -89,7 +89,7 @@ MDScreenManager:
         MDBottomNavigationItem:
             name: 'eventos'
             text: 'Eventos'
-            icon: 'account-group'
+            icon: 'calendar-month'
             MDLabel:
                 text: "Eventos"
                 halign: "center"
