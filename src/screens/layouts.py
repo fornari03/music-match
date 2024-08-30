@@ -74,9 +74,9 @@ MDScreenManager:
             name: 'inicio'
             text: 'Início'
             icon: 'music-circle'
-            MDLabel:
-                text: "Minhas músicas"
-                halign: "center"
+            MDScrollView:
+                MDList:
+                    id: music_list
 
         MDBottomNavigationItem:
             name: 'buscar'
