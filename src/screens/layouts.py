@@ -129,14 +129,24 @@ MDScreenManager:
         MDTextField:
             id: nome
             hint_text: "Nome"
+            required: True
+            max_text_length: 10
+            helper_text_mode: "on_error"
+            helper_text: "Nome inválido"
             icon_right: "account"
             mode: "rectangle"
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
+            on_text_validate:
+                root.inputtextfn()
+                root.text_validate()
 
         MDTextField:
             id: email
+            validator: "email"
+            helper_text: "Email não preenchido corretamente"
+            helper_text_mode: "on_error"
             hint_text: "Email"
             icon_right: "email"
             mode: "rectangle"
@@ -146,7 +156,7 @@ MDScreenManager:
 
         MDTextField:
             id: nascimento
-            hint_text: "Data de Nascimento"
+            hint_text: "Data de nascimento"
             icon_right: "calendar"
             mode: "rectangle"
             size_hint_x: None
@@ -157,8 +167,11 @@ MDScreenManager:
         MDTextField:
             id: senha
             hint_text: "Senha"
-            icon_right: "lock"
+            required: True
             password: True
+            min_text_length: 8
+            helper_text: "Mínimo de 8 caracteres"
+            helper_text_mode: "on_error"
             mode: "rectangle"
             size_hint_x: None
             width: 300
@@ -177,5 +190,7 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
-            on_release: root.sign_up()    
+            on_release: 
+                root.ids.userinput.dispatch('on_text_validate')
+                root.sign_up()    
 '''
