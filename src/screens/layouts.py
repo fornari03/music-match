@@ -145,7 +145,7 @@ MDScreenManager:
             pos_hint: {"center_x": 0.5}
 
         MDTextField:
-            id: nascimento
+            id: data_nascimento
             hint_text: "Data de Nascimento"
             icon_right: "calendar"
             mode: "rectangle"
