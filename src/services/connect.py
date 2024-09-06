@@ -4,13 +4,24 @@ from config import load_config
 class DBConnection:
 
     def __init__(self):
-        try:
-            self.con = psycopg2.connect(**load_config())
-        except (psycopg2.DatabaseError, Exception) as error:
-            print(error)
+        self.conn_data = load_config()
 
-    def __del__(self):
-        try:
-            self.con.close()
-        except:
-            pass
+    def query(self, sql: str, hasReturn: bool):
+        conn = psycopg2.connect(**self.conn_data)
+
+        # cursor para realizar operacoes no banco de dados, parece que eh necessario
+        curs = conn.cursor()
+
+        # executa o comando fornecido
+        curs.execute(sql)
+
+        data = ()
+        if hasReturn:
+            data = curs.fecthone()
+
+        conn.commit()
+        curs.close()
+        conn.close()
+
+        if hasReturn:
+            return data
