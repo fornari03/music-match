@@ -45,12 +45,35 @@ MDScreenManager:
         MDTextField:
             id: senha
             hint_text: "Senha"
-            icon_right: "lock"
+            icon_right: "eye-off"
             password: True
             mode: "rectangle"
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
+        MDBoxLayout:
+            size_hint: .85, None
+            height: "30dp"
+            pos_hint: {'center_x':.5, 'center_y':.5}
+            MDCheckbox:
+                id: cb
+                size_hint: None, None
+                width: "30dp"
+                height: "30dp"
+                pos_hint: {'center_x':.5, 'center_y':.5}
+                on_press:
+                    senha.password = True if senha.password == False else False 
+                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
+            
+            MDLabel:
+                text: "[ref=Mostrar Senha]Mostrar Senha[/ref]"
+                markup: True
+                pos_hint: {'center_x':.5, 'center_y':.5}
+                on_ref_press:
+                    cb.active = True if cb.active == False else False
+                    senha.password = True if senha.password == False else False 
+                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
+
         MDRaisedButton:
             text: "Login"
             md_bg_color: (1, 0, 1, 1)
@@ -138,6 +161,8 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
+            on_text:
+                self.text = self.text.replace(" ", "")
             on_text_validate:
                 root.inputtextfn()
                 root.text_validate()
@@ -153,6 +178,8 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
+            on_text:
+                self.text = self.text.replace(" ", "")
 
         MDTextField:
             id: nascimento
@@ -167,6 +194,7 @@ MDScreenManager:
         MDTextField:
             id: senha
             hint_text: "Senha"
+            icon_right: "eye-off"
             required: True
             password: True
             min_text_length: 8
@@ -176,6 +204,31 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
+            on_text:
+                self.text = self.text.replace(" ", "")
+
+        MDBoxLayout:
+            size_hint: .85, None
+            height: "30dp"
+            pos_hint: {'center_x':.5, 'center_y':.5}
+            MDCheckbox:
+                id: cb
+                size_hint: None, None
+                width: "30dp"
+                height: "30dp"
+                pos_hint: {'center_x':.5, 'center_y':.5}
+                on_press:
+                    senha.password = True if senha.password == False else False 
+                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
+            
+            MDLabel:
+                text: "[ref=Mostrar Senha]Mostrar Senha[/ref]"
+                markup: True
+                pos_hint: {'center_x':.5, 'center_y':.5}
+                on_ref_press:
+                    cb.active = True if cb.active == False else False
+                    senha.password = True if senha.password == False else False 
+                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
 
         MDRaisedButton:
             text: "Adicionar Foto de Perfil"
