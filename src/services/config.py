@@ -4,8 +4,6 @@ def load_config(filename='src/services/database.ini', section='postgresql'):
     parser = ConfigParser()
     parser.read(filename)
 
-    print(parser.sections())
-
     # pega a secao do arquivo database.ini
     config = {}
     if parser.has_section(section):
