@@ -9,8 +9,26 @@ class Usuario:
 
     # troca os valores dos atributos
     def change_values(self, data: dict):
-        #TODO
-        pass
+        for key in data.keys():
+            if key == 'id' and not self.__isnew:
+                self.id = data[key]
+            elif key == "nome":
+                self.nome = data[key]
+            elif key == "email":
+                self.email = data[key]
+            elif key == "senha":
+                if self.__isnew:
+                    self.senha = self.encrypt_password(data[key])
+                else:
+                    self.senha = data[key]
+            elif key == "data_nascimento":
+                self.data_nascimento = data[key]
+            elif key == "foto_perfil":
+                self.foto_perfil = data[key]
+    
+    # metodo privado pra dizer se uma instancia desse objeto foi criada pelo programa (True) ou se foi importada do BD (False)
+    def __setIsNew(self, val: bool):
+        self.__isnew = val
 
     # salva o objeto usuario no banco de dados com os atributos que ele tem
     def save(self):
@@ -18,7 +36,7 @@ class Usuario:
         pass
 
     # faz a codificacao da senha
-    def encrypt_password(self):
+    def encrypt_password(self, password: str):
         #TODO
         pass
     
@@ -41,9 +59,13 @@ class Usuario:
         
         lines = DBConnection.query(sql, True)
 
+        if lines == -1:
+            return -1
+
         obj = []
         for inst in lines:
             new_obj = Usuario()
+            new_obj.__setIsNew(False)
             read_data = {"id": inst[0], "nome": inst[1], "email": inst[2], "senha": inst[3], "data_nascimento": inst[4], "foto_perfil": inst[5]}
             new_obj.change_values(read_data)
 
@@ -58,4 +80,12 @@ class Usuario:
         pass
 
 if __name__ == '__main__':
-    print(Usuario.where({"nome": "'aurelio'"}))
+    for u in Usuario.where({"nome": "'aurelio'"}):
+        print(u.id)
+        print(u.nome)
+        print(u.email)
+        print(u.senha)
+        print(u.data_nascimento)
+        print(u.foto_perfil)
+
+        print()
