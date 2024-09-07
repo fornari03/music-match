@@ -76,8 +76,23 @@ class Usuario:
     # apaga as instancias no BD com aqueles dados
     @staticmethod
     def delete(data: dict):
-        #TODO? nem sei se eh bom fazer esse metodo
-        pass
+        sql = "DELETE FROM Usuario"
+        
+        if len(data.keys()) != 0:
+            key0 = next(iter(data))
+            sql += f" WHERE {key0}={data[key0]}"
+
+            for key in data:
+                if key == key0:
+                    continue
+
+                sql += f" AND {key}={data[key]}"
+
+        query = DBConnection.query(sql, False)
+
+        if query == -1:
+            return False
+        return True
 
 if __name__ == '__main__':
     for u in Usuario.where({"nome": "'aurelio'"}):
