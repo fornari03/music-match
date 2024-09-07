@@ -1,4 +1,5 @@
 from ..services.connect import DBConnection
+import hashlib
 
 class Usuario:
 
@@ -37,8 +38,11 @@ class Usuario:
 
     # faz a codificacao da senha
     def encrypt_password(self, password: str):
-        #TODO
-        pass
+        hash_object = hashlib.sha256()
+        hash_object.update(password.encode())
+        hash_password = hash_object.hexdigest()
+        
+        return hash_password
     
     # retorna todos as instancias no BD que possuem os dados especificados
     # lembra de colocar as aspas simples em volta dos valores que sao text la no BD
