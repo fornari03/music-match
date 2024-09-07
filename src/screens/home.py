@@ -4,9 +4,10 @@ from kivymd.uix.pickers import MDDatePicker
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.selectioncontrol.selectioncontrol import MDCheckbox
 from kivymd.uix.card import MDCard
-from kivymd.uix.button import MDRaisedButton, MDRoundFlatIconButton, MDIconButton
+from kivymd.uix.button import MDRaisedButton, MDRoundFlatIconButton, MDIconButton, MDFlatButton
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
+from kivymd.uix.dialog import MDDialog
 import webbrowser
 
 class HomeScreen(MDScreen):
@@ -32,9 +33,9 @@ class HomeScreen(MDScreen):
             self.add_music_item(music)
 
         connections = [
-            {"name": "João Silva", "social_media": ["Instagram: @joaosilva", "Twitter: @jsilva12", "Facebook: /joaosilvaa"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 87},
-            {"name": "Maria Souza", "social_media": ["Twitter: @mariasouza"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 75},
-            {"name": "Pedro Oliveira", "social_media": ["Facebook: /pedro.oliveira"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 65}
+            {"id": 2, "name": "João Silva", "social_media": ["Instagram: @joaosilva", "Twitter: @jsilva12", "Facebook: /joaosilvaa"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 87},
+            {"id": 3, "name": "Maria Souza", "social_media": ["Twitter: @mariasouza"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 75},
+            {"id": 4, "name": "Pedro Oliveira", "social_media": ["Facebook: /pedro.oliveira"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 65}
         ]
 
         for connection in connections:
@@ -90,7 +91,7 @@ class HomeScreen(MDScreen):
     ############################## Tela de Conexões ##############################
 
     def add_connection_banner(self, connection):
-        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300)
+        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300, on_release=lambda x: self.open_profile(connection['id']))
 
         box_layout = MDBoxLayout(orientation="vertical", padding=[10], spacing=10)
 
@@ -102,15 +103,45 @@ class HomeScreen(MDScreen):
 
         box_layout.add_widget(MDLabel(text=f"Music Match: {connection['music_match']}%", size_hint=(0.3, 0.1)))
 
-        box_layout.add_widget(MDRoundFlatIconButton(text="Desconectar", size_hint=(0.25, None), icon="account-minus", icon_color="red", text_color="red", line_color="red", on_release=self.remove_connection))
+        disconnectButton = MDRoundFlatIconButton(text="Desconectar", size_hint=(0.25, None), icon="account-minus", icon_color="red", text_color="red", line_color="red")
+
+        disconnectButton.on_release = lambda: self.remove_connection(banner)
+
+        box_layout.add_widget(disconnectButton)
 
         banner.add_widget(box_layout)
 
         self.ids.connections_grid.add_widget(banner)
 
-    def remove_connection(self, connection_id):
-        print(f"Removendo conexão {connection_id}")
-        self.ids.connections_grid.remove_widget(self.ids.connections_grid.children[connection_id])
+    def remove_connection(self, banner):
+        for i in range(len(self.ids.connections_grid.children)-1, -1, -1):
+            if self.ids.connections_grid.children[i] == banner:
+                self.dialog = MDDialog(
+                    text=f"Deseja se desconectar de {banner.children[0].children[4].text}?",
+                    buttons=[
+                        MDFlatButton(
+                            text="Cancelar",
+                            theme_text_color="Custom",
+                            text_color=self.theme_cls.primary_color,
+                            on_release=lambda x: self.dialog.dismiss()
+                        ),
+                        MDFlatButton(
+                            text="Desconectar",
+                            theme_text_color="Custom",
+                            text_color=self.theme_cls.primary_color,
+                            on_release=lambda x: self.confirm_disconect(i))])
+                
+                self.dialog.open()
+                break
+        # TODO: implementar lógica de remoção de conexão com o API do backend
+
+    def confirm_disconect(self, idx):
+        """Método que apaga o MDCard da conexão com o usuário de índice idx no grid."""
+        self.dialog.dismiss()
+        self.ids.connections_grid.remove_widget(self.ids.connections_grid.children[idx])
+
+    def open_profile(self, connection_id):
+        pass
 
 
     ############################## Tela de Perfil ##############################
