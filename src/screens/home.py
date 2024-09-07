@@ -13,9 +13,10 @@ class HomeScreen(MDScreen):
     ############################## Tela de Início ##############################
 
     def on_pre_enter(self):
-        """Método para colocar todas as músicas do banco de dados na lista da tela"""
+        """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
 
         # TODO: implementar lógica de receber todas as músicas ainda não avaliadas com a API do backend (ordem aleatoria)
+        # TODO: implementar lógica de receber os dados do usuário que fez o login com a API do backend
         
         musics_example = [
             {"id": 1, "capa": "https://via.placeholder.com/150", "titulo": "musica 1", "artista": "artista 1", "genero": "MPB", "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
