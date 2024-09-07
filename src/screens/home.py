@@ -1,11 +1,16 @@
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.list import TwoLineAvatarIconListItem, ImageLeftWidget, IconRightWidget
+from kivymd.uix.list import TwoLineAvatarIconListItem, OneLineIconListItem, ImageLeftWidget, IconRightWidget
+from kivymd.uix.pickers import MDDatePicker
+from kivymd.uix.textfield import MDTextField
+from kivymd.uix.selectioncontrol.selectioncontrol import MDCheckbox
 import webbrowser
 
 class HomeScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.music_icons = {}
+
+    ############################## Tela de Início ##############################
 
     def on_pre_enter(self):
         """Método para colocar todas as músicas do banco de dados na lista da tela"""
@@ -63,3 +68,41 @@ class HomeScreen(MDScreen):
             dislike_icon.icon = "thumb-down"
         like_icon.icon = "thumb-up-outline"
         # TODO: implementar lógica de avaliação com a API do backend
+
+    
+    ############################## Tela de Perfil ##############################
+
+    def show_date_picker(self):
+        date_dialog = MDDatePicker()
+        date_dialog.open()
+        date_dialog.bind(on_save=self.on_save)
+
+    def on_save(self, instance, value, date_range):
+        self.ids.data_nascimento.text = value.strftime("%d/%m/%Y")
+
+    def save(self):
+        # TODO: verificar se campos estão preenchidos e são válidos
+        nome = self.ids.nome.text.strip()
+        email = self.ids.email.text.strip()
+        data_nascimento = self.ids.data_nascimento.text.strip()
+        senha = self.ids.senha.text.strip()
+        lista_redes_sociais = [(child.children[0].hint_text.strip(), child.children[0].text.strip()) for child in self.ids.lista_opcoes.children if child.children[1].active and child.children[0].text.strip() != ""] # lista de tuplas (nome_rede_social, usuario) habilitados e preenchidos
+        # TODO: implementar lógica de edição dos dados com o API do backend
+        pass
+
+    def set_profile_pic(self):
+        # TODO: possibilitar abrir arquivos de imagem do dispositivo
+        pass
+
+    def add_social_media_item(self, social_media: str):
+        new_item = OneLineIconListItem(on_press=lambda x: self.checkbox_selected(len(self.ids.lista_opcoes.children)))
+        
+        new_item.add_widget(MDCheckbox(size_hint_x=None, pos_hint={"center_y": 0.5}))
+        new_item.add_widget(MDTextField(hint_text=social_media, size_hint_x=0.6, pos_hint={"center_y": 0.5, "center_x": 0.5}))
+        
+        self.ids.lista_opcoes.add_widget(new_item)
+
+        self.ids.nova_rede_social.text = ""
+
+    def checkbox_selected(self, item_id):
+        pass
