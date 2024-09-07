@@ -5,12 +5,18 @@ class Usuario:
 
     # inicializa um objeto do tipo Usuario com os dados iniciais dados
     def __init__(self):
-        #TODO
-        pass
+        self.id = None
+        self.nome = None
+        self.email = None
+        self.senha = None
+        self.data_nascimento = None
+        self.foto_perfil = None
+        self.__setIsNew(True)
 
     # troca os valores dos atributos
     def change_values(self, data: dict):
         for key in data.keys():
+            # tem que ter + condicao pro id, nem sei se eh bom deixar mudar id
             if key == 'id' and not self.__isnew:
                 self.id = data[key]
             elif key == "nome":
@@ -33,8 +39,28 @@ class Usuario:
 
     # salva o objeto usuario no banco de dados com os atributos que ele tem
     def save(self):
-        #TODO
-        pass
+        if self.nome == None:
+            self.nome = "NULL"
+        if self.email == None:
+            return False
+        if self.senha == None:
+            self.senha = "NULL"
+        if self.data_nascimento == None:
+            self.data_nascimento = "NULL"
+        if self.foto_perfil == None:
+            self.foto_perfil = "NULL"
+
+        if self.__isnew:
+            sql = f"INSERT INTO usuario (nome, email, senha, data_nascimento, foto_perfil) VALUES ({self.nome}, {self.email}, {self.senha}, {self.data_nascimento}, {self.foto_perfil})"
+        else:
+            sql = f"UPDATE usuario SET nome={self.nome}, email={self.email}, senha={self.senha}, data_nascimento={self.data_nascimento}, foto_perfil={self.foto_perfil} WHERE id={self.id}"
+
+        if DBConnection.query(sql, False):
+            return False
+        
+        self.__setIsNew(False)
+        
+        return True
 
     # faz a codificacao da senha
     def encrypt_password(self, password: str):
@@ -64,7 +90,7 @@ class Usuario:
         lines = DBConnection.query(sql, True)
 
         if lines == -1:
-            return -1
+            return False
 
         obj = []
         for inst in lines:
@@ -99,12 +125,7 @@ class Usuario:
         return True
 
 if __name__ == '__main__':
-    for u in Usuario.where({"nome": "'aurelio'"}):
-        print(u.id)
-        print(u.nome)
-        print(u.email)
-        print(u.senha)
-        print(u.data_nascimento)
-        print(u.foto_perfil)
+    u = Usuario.where({"nome": "'fulano'"})[0]
 
-        print()
+    u.change_values({"nome": "'ciclano'", "email": "'fulano@email.com'"})
+    u.save()
