@@ -108,9 +108,115 @@ MDScreenManager:
             name: 'perfil'
             text: 'Perfil'
             icon: 'account'
-            MDLabel:
-                text: "Perfil"
-                halign: "center"
+            MDBoxLayout:
+                orientation: 'vertical'
+                spacing: dp(5)
+                padding: dp(20)
+                MDLabel:
+                    text: "Seu perfil"
+                    halign: "center"
+                    theme_text_color: "Custom"
+                    text_color: (1, 0, 1, 1)
+                    font_style: "H4"
+                MDGridLayout:
+                    cols: 2
+                    row_default_height: dp(60)
+                    row_force_default: True
+                    spacing: dp(20)
+                    padding: dp(10)
+                    size_hint_y: None
+                    height: self.minimum_height
+                    adaptive_height: True
+                    MDTextField:
+                        id: nome
+                        hint_text: "Nome"
+                        icon_right: "account"
+                        mode: "rectangle"
+                        size_hint_x: 0.4
+                        pos_hint: {"center_x": 0.5}
+                    MDTextField:
+                        id: email
+                        hint_text: "Email"
+                        icon_right: "email"
+                        mode: "rectangle"
+                        size_hint_x: 0.4
+                        pos_hint: {"center_x": 0.5}
+                    MDTextField:
+                        id: data_nascimento
+                        hint_text: "Data de Nascimento"
+                        icon_right: "calendar"
+                        mode: "rectangle"
+                        size_hint_x: 0.4
+                        pos_hint: {"center_x": 0.5}
+                        on_focus: if self.focus: root.show_date_picker()
+                    MDTextField:
+                        id: senha
+                        hint_text: "Senha"
+                        icon_right: "lock"
+                        password: True
+                        mode: "rectangle"
+                        size_hint_x: 0.4
+                        pos_hint: {"center_x": 0.5}
+                MDScrollView:
+                    MDList:
+                        id: lista_opcoes
+                        OneLineIconListItem:
+                            on_press: root.checkbox_selected(1)
+                            MDCheckbox:
+                                id: checkbox_1
+                                size_hint_x: None
+                                pos_hint: {"center_y": 0.5}
+                            MDTextField:
+                                hint_text: "Facebook"
+                                size_hint_x: 0.6
+                                pos_hint: {"center_y": 0.5, "center_x": 0.5}
+                        OneLineIconListItem:
+                            on_press: root.checkbox_selected(2)
+                            MDCheckbox:
+                                id: checkbox_2
+                                size_hint_x: None
+                                pos_hint: {"center_y": 0.5}
+                            MDTextField:
+                                hint_text: "Instagram"
+                                size_hint_x: 0.6
+                                pos_hint: {"center_y": 0.5, "center_x": 0.5}
+                        OneLineIconListItem:
+                            on_press: root.checkbox_selected(3)
+                            MDCheckbox:
+                                id: checkbox_3
+                                size_hint_x: None
+                                pos_hint: {"center_y": 0.5}
+                            MDTextField:
+                                hint_text: "Twitter"
+                                size_hint_x: 0.6
+                                pos_hint: {"center_y": 0.5, "center_x": 0.5}
+                MDGridLayout:
+                    cols: 3
+                    spacing: dp(20)
+                    padding: dp(10)
+                    size_hint_y: None
+                    height: self.minimum_height
+                    adaptive_height: True
+                    MDRaisedButton:
+                        text: "Adicionar Nova Rede"
+                        on_release: root.add_social_media_item(root.ids.nova_rede_social.text)
+                        size_hint_x: 0.1
+                        pos_hint: {"center_x": 0.15}
+                    MDTextField:
+                        id: nova_rede_social
+                        hint_text: "Nome da rede social"
+                        size_hint_x: 0.6
+                        pos_hint: {"center_x": 0.85}
+                    MDLabel:
+                        text: "" # gambiarra total para ajustar o layout
+                MDRaisedButton:
+                    text: "Salvar"
+                    md_bg_color: (0.31, 0.78, 0.47, 1)
+                    size_hint_x: None
+                    width: 300
+                    pos_hint: {"center_x": 0.5}
+                    on_release: root.save()
+
 
 <SignUpScreen>:
     name: "sign_up_screen"
