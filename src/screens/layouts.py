@@ -81,14 +81,6 @@ MDScreenManager:
                     id: music_list
 
         MDBottomNavigationItem:
-            name: 'buscar'
-            text: 'Buscar'
-            icon: 'magnify'
-            MDLabel:
-                text: "Buscar"
-                halign: "center"
-
-        MDBottomNavigationItem:
             name: 'eventos'
             text: 'Eventos'
             icon: 'calendar-month'
