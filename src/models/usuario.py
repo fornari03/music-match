@@ -1,5 +1,5 @@
 from ..services.connect import DBConnection
-import hashlib
+from ..utils.encrypt import encrypt_password
 
 class Usuario:
 
@@ -25,7 +25,7 @@ class Usuario:
                 self.email = data[key]
             elif key == "senha":
                 if self.__isnew:
-                    self.senha = self.encrypt_password(data[key])
+                    self.senha = encrypt_password(data[key])
                 else:
                     self.senha = data[key]
             elif key == "data_nascimento":
@@ -61,14 +61,6 @@ class Usuario:
         self.__setIsNew(False)
         
         return True
-
-    # faz a codificacao da senha
-    def encrypt_password(self, password: str):
-        hash_object = hashlib.sha256()
-        hash_object.update(password.encode())
-        hash_password = hash_object.hexdigest()
-        
-        return hash_password
     
     # retorna todos as instancias no BD que possuem os dados especificados
     # lembra de colocar as aspas simples em volta dos valores que sao text la no BD
@@ -123,9 +115,3 @@ class Usuario:
         if query == -1:
             return False
         return True
-
-if __name__ == '__main__':
-    u = Usuario.where({"nome": "'fulano'"})[0]
-
-    u.change_values({"nome": "'ciclano'", "email": "'fulano@email.com'"})
-    u.save()
