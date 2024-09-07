@@ -3,6 +3,10 @@ from kivymd.uix.list import TwoLineAvatarIconListItem, OneLineIconListItem, Imag
 from kivymd.uix.pickers import MDDatePicker
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.selectioncontrol.selectioncontrol import MDCheckbox
+from kivymd.uix.card import MDCard
+from kivymd.uix.button import MDRaisedButton, MDRoundFlatIconButton, MDIconButton
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.label import MDLabel
 import webbrowser
 
 class HomeScreen(MDScreen):
@@ -17,7 +21,7 @@ class HomeScreen(MDScreen):
 
         # TODO: implementar lógica de receber todas as músicas ainda não avaliadas com a API do backend (ordem aleatoria)
         # TODO: implementar lógica de receber os dados do usuário que fez o login com a API do backend
-        
+
         musics_example = [
             {"id": 1, "capa": "https://via.placeholder.com/150", "titulo": "musica 1", "artista": "artista 1", "genero": "MPB", "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
             {"id": 2, "capa": "https://via.placeholder.com/150", "titulo": "musica 2", "artista": "artista 2", "genero": "Pop", "spotify_link": "https://open.spotify.com"},
@@ -26,6 +30,15 @@ class HomeScreen(MDScreen):
         
         for music in musics_example:
             self.add_music_item(music)
+
+        connections = [
+            {"name": "João Silva", "social_media": ["Instagram: @joaosilva", "Twitter: @jsilva12", "Facebook: /joaosilvaa"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 87},
+            {"name": "Maria Souza", "social_media": ["Twitter: @mariasouza"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 75},
+            {"name": "Pedro Oliveira", "social_media": ["Facebook: /pedro.oliveira"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 65}
+        ]
+
+        for connection in connections:
+            self.add_connection_banner(connection)
 
     def add_music_item(self, music):
         item = TwoLineAvatarIconListItem(text=f"{music['titulo']} - {music['genero']}", secondary_text=f"{music['artista']}")
@@ -70,7 +83,36 @@ class HomeScreen(MDScreen):
         like_icon.icon = "thumb-up-outline"
         # TODO: implementar lógica de avaliação com a API do backend
 
-    
+
+    ############################## Tela de Eventos ##############################
+
+
+    ############################## Tela de Conexões ##############################
+
+    def add_connection_banner(self, connection):
+        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300)
+
+        box_layout = MDBoxLayout(orientation="vertical", padding=[10], spacing=10)
+
+        box_layout.add_widget(MDLabel(text=connection['name'], size_hint=(None, 0.1)))
+
+        box_layout.add_widget(MDLabel(text="    //    ".join(connection['social_media']), size_hint=(0.9, 0.2)))
+
+        box_layout.add_widget(MDLabel(text=f"Gosto musical: {', '.join([': '.join([genero, str(perc)+'%']) for [genero, perc] in connection['musical_taste']])}", size_hint=(0.9, 0.1)))
+
+        box_layout.add_widget(MDLabel(text=f"Music Match: {connection['music_match']}%", size_hint=(0.3, 0.1)))
+
+        box_layout.add_widget(MDRoundFlatIconButton(text="Desconectar", size_hint=(0.25, None), icon="account-minus", icon_color="red", text_color="red", line_color="red", on_release=self.remove_connection))
+
+        banner.add_widget(box_layout)
+
+        self.ids.connections_grid.add_widget(banner)
+
+    def remove_connection(self, connection_id):
+        print(f"Removendo conexão {connection_id}")
+        self.ids.connections_grid.remove_widget(self.ids.connections_grid.children[connection_id])
+
+
     ############################## Tela de Perfil ##############################
 
     def show_date_picker(self):
