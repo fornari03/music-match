@@ -152,15 +152,14 @@ MDScreenManager:
         MDTextField:
             id: nome
             hint_text: "Nome"
-            required: True
             max_text_length: 10
             helper_text_mode: "on_error"
-            helper_text: "Nome inválido"
+            helper_text: "Máximo de 10 caracteres"
             icon_right: "account"
             mode: "rectangle"
             size_hint_x: None
             width: 300
-            pos_hint: {"center_x": 0.5}
+            pos_hint: {'center_x':.5, 'center_y':.5}
             on_text:
                 self.text = self.text.replace(" ", "")
             on_text_validate:
@@ -170,14 +169,14 @@ MDScreenManager:
         MDTextField:
             id: email
             validator: "email"
-            helper_text: "Email não preenchido corretamente"
+            helper_text: "Insira seu email"
             helper_text_mode: "on_error"
             hint_text: "Email"
             icon_right: "email"
             mode: "rectangle"
             size_hint_x: None
             width: 300
-            pos_hint: {"center_x": 0.5}
+            pos_hint: {'center_x':.5, 'center_y':.5}
             on_text:
                 self.text = self.text.replace(" ", "")
 
@@ -195,15 +194,14 @@ MDScreenManager:
             id: senha
             hint_text: "Senha"
             icon_right: "eye-off"
-            required: True
             password: True
-            min_text_length: 8
-            helper_text: "Mínimo de 8 caracteres"
+            max_text_length: 10
+            helper_text: "Máximo de 10 caracteres"
             helper_text_mode: "on_error"
             mode: "rectangle"
             size_hint_x: None
             width: 300
-            pos_hint: {"center_x": 0.5}
+            pos_hint: {'center_x':.5, 'center_y':.5}
             on_text:
                 self.text = self.text.replace(" ", "")
 
