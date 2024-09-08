@@ -8,6 +8,9 @@ from kivymd.uix.button import MDRaisedButton, MDRoundFlatIconButton, MDIconButto
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
 from kivymd.uix.dialog import MDDialog
+from kivymd.uix.scrollview import MDScrollView
+from kivymd.uix.gridlayout import MDGridLayout
+from kivymd.uix.list import MDList
 import webbrowser
 
 class HomeScreen(MDScreen):
@@ -95,7 +98,7 @@ class HomeScreen(MDScreen):
     ############################## Tela de Conexões ##############################
 
     def add_connection_banner(self, connection, status):
-        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300, on_release=lambda x: self.open_profile(connection['id']))
+        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300, on_release=lambda x: self.open_profile(connection))
 
         box_layout = MDBoxLayout(orientation="vertical", padding=[10], spacing=10)
 
@@ -184,16 +187,35 @@ class HomeScreen(MDScreen):
         self.show_grid()
         # TODO: implementar lógica de adição de conexão com o API do backend
 
-    def open_profile(self, connection_id):
+    def open_profile(self, user):
+        # TODO: verificar se é plausível abrir o perfil do usuário em um dialog ou outra tela
+        # self.dialog = MDDialog(
+        #         title="Ver Perfil",
+        #         type="custom",
+        #         size_hint=(0.8, 0.8),
+        #         content_cls=
+        #             MDBoxLayout(
+        #                 MDLabel(text=user['name']),
+        #                 MDLabel(text="    //    ".join(user['social_media'])),
+        #                 MDLabel(text=f"Gosto musical: {', '.join([': '.join([genero, str(perc)+'%']) for [genero, perc] in user['musical_taste']])}"),
+        #                 MDLabel(text=f"Music Match: {user['music_match']}%"),
+        #                 orientation="vertical",
+        #                 padding=[10],
+        #                 spacing=10,
+        #                 size_hint=(0.8, 0.8)
+        #             )        
+        #     )
+        # self.dialog.open()
         pass
 
-    def show_grid(self):
+    def show_grid(self, search_string=None):
         # TODO: melhorar algoritmo de mostrar usuários conectados e não conectados,
         # calcular e ordenar por music_match
         self.ids.connections_grid.clear_widgets()
         if self.showing_users_connected:
             for connection in self.connected:
-                self.add_connection_banner(connection, "connected")
+                if search_string is None or search_string.lower().strip() in connection['name'].lower().strip() or search_string.lower().strip() in connection['social_media'] or search_string.lower().strip() == "":
+                    self.add_connection_banner(connection, "connected")
         else:
             for connection in self.not_connected:
                 self.add_connection_banner(connection, "not_connected")
@@ -203,14 +225,24 @@ class HomeScreen(MDScreen):
         self.show_grid()
 
     def show_users_search(self):
-        self.ids.search_bar.size_hint_y = 0.1
-        self.ids.search_bar.height = 50
-        self.ids.search_bar.opacity = 1
-        self.ids.search_bar.disabled = False
-        self.ids.search_bar.focus = True
+        self.dialog = MDDialog(
+            title="Buscar Usuário",
+            type="custom",
+            content_cls=
+                MDBoxLayout(
+                    MDTextField(id="barra_pesquisa", hint_text="Nome do Usuário"),
+                    MDRaisedButton(text="Buscar", on_release=lambda x: self.search_user(self.dialog.content_cls.children[1].text.strip())),
+                    orientation="vertical",
+                    spacing="12dp",
+                    size_hint_y=None,
+                    height="120dp"
+                )        
+        )
+        self.dialog.open()
 
-    def search_user(self):
-        pass
+    def search_user(self, search_string):
+        self.show_grid(search_string)
+        self.dialog.dismiss()
 
     ############################## Tela de Perfil ##############################
 
