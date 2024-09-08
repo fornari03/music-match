@@ -95,12 +95,11 @@ MDScreenManager:
             MDBoxLayout:
                 orientation: 'vertical'
                 padding: dp(0)
-                MDLabel:
-                    text: "Suas Conexões"
-                    halign: "center"
-                    theme_text_color: "Custom"
-                    text_color: (1, 0, 1, 1)
-                    font_size: "40sp"
+                MDTopAppBar:
+                    title: "Conexões"
+                    md_bg_color: (1, 0, 1, 1)
+                    left_action_items: [["order-bool-ascending", lambda x: root.switch_users_view()]]
+                    right_action_items: [["magnify", lambda x: root.show_users_search()]]
 
                 MDScrollView:
                     MDGridLayout:

@@ -14,14 +14,16 @@ class HomeScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.music_icons = {}
+        self.showing_users_connected = True
 
     ############################## Tela de Início ##############################
 
     def on_pre_enter(self):
         """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
-
         # TODO: implementar lógica de receber todas as músicas ainda não avaliadas com a API do backend (ordem aleatoria)
         # TODO: implementar lógica de receber os dados do usuário que fez o login com a API do backend
+        # TODO: implementar lógica de receber os usuários conectados com a API do backend
+        # TODO: implementar lógica de receber os usuários não conectados com a API do backend
 
         musics_example = [
             {"id": 1, "capa": "https://via.placeholder.com/150", "titulo": "musica 1", "artista": "artista 1", "genero": "MPB", "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
@@ -32,14 +34,16 @@ class HomeScreen(MDScreen):
         for music in musics_example:
             self.add_music_item(music)
 
-        connections = [
+        self.connected = [
             {"id": 2, "name": "João Silva", "social_media": ["Instagram: @joaosilva", "Twitter: @jsilva12", "Facebook: /joaosilvaa"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 87},
             {"id": 3, "name": "Maria Souza", "social_media": ["Twitter: @mariasouza"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 75},
             {"id": 4, "name": "Pedro Oliveira", "social_media": ["Facebook: /pedro.oliveira"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 65}
         ]
 
-        for connection in connections:
-            self.add_connection_banner(connection)
+        self.not_connected = [
+            {"id": 5, "name": "Henrique Vale", "social_media": ["Facebook: /h.valee"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 12}
+        ]
+        self.show_grid()
 
     def add_music_item(self, music):
         item = TwoLineAvatarIconListItem(text=f"{music['titulo']} - {music['genero']}", secondary_text=f"{music['artista']}")
@@ -90,7 +94,7 @@ class HomeScreen(MDScreen):
 
     ############################## Tela de Conexões ##############################
 
-    def add_connection_banner(self, connection):
+    def add_connection_banner(self, connection, status):
         banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300, on_release=lambda x: self.open_profile(connection['id']))
 
         box_layout = MDBoxLayout(orientation="vertical", padding=[10], spacing=10)
@@ -103,9 +107,12 @@ class HomeScreen(MDScreen):
 
         box_layout.add_widget(MDLabel(text=f"Music Match: {connection['music_match']}%", size_hint=(0.3, 0.1)))
 
-        disconnectButton = MDRoundFlatIconButton(text="Desconectar", size_hint=(0.25, None), icon="account-minus", icon_color="red", text_color="red", line_color="red")
-
-        disconnectButton.on_release = lambda: self.remove_connection(banner)
+        if status == "connected":
+            disconnectButton = MDRoundFlatIconButton(text="Desconectar", size_hint=(0.25, None), icon="account-minus", icon_color="red", text_color="red", line_color="red")
+            disconnectButton.on_release = lambda: self.remove_connection(banner)
+        else:
+            disconnectButton = MDRoundFlatIconButton(text="Conectar", size_hint=(0.25, None), icon="account-plus", icon_color="green", text_color="green", line_color="green")
+            disconnectButton.on_release = lambda: self.add_connection(banner)
 
         box_layout.add_widget(disconnectButton)
 
@@ -133,16 +140,77 @@ class HomeScreen(MDScreen):
                 
                 self.dialog.open()
                 break
-        # TODO: implementar lógica de remoção de conexão com o API do backend
 
     def confirm_disconect(self, idx):
         """Método que apaga o MDCard da conexão com o usuário de índice idx no grid."""
         self.dialog.dismiss()
         self.ids.connections_grid.remove_widget(self.ids.connections_grid.children[idx])
+        idx = len(self.connected) - idx - 1
+        user = self.connected[idx]
+        self.not_connected.append(user)
+        self.connected.pop(idx)
+        self.show_grid()
+        # TODO: implementar lógica de remoção de conexão com o API do backend
+
+    def add_connection(self, banner):
+        for i in range(len(self.ids.connections_grid.children)-1, -1, -1):
+            if self.ids.connections_grid.children[i] == banner:
+                self.dialog = MDDialog(
+                    text=f"Deseja se conectar com {banner.children[0].children[4].text}?",
+                    buttons=[
+                        MDFlatButton(
+                            text="Cancelar",
+                            theme_text_color="Custom",
+                            text_color=self.theme_cls.primary_color,
+                            on_release=lambda x: self.dialog.dismiss()
+                        ),
+                        MDFlatButton(
+                            text="Conectar",
+                            theme_text_color="Custom",
+                            text_color=self.theme_cls.primary_color,
+                            on_release=lambda x: self.confirm_connect(i))])
+                
+                self.dialog.open()
+                break
+
+    def confirm_connect(self, idx):
+        """Método que adiciona o MDCard da conexão com o usuário de índice idx no grid."""
+        self.dialog.dismiss()
+        self.ids.connections_grid.remove_widget(self.ids.connections_grid.children[idx])
+        idx = len(self.not_connected) - idx - 1
+        user = self.not_connected[idx]
+        self.connected.append(user)
+        self.not_connected.pop(idx)
+        self.show_grid()
+        # TODO: implementar lógica de adição de conexão com o API do backend
 
     def open_profile(self, connection_id):
         pass
 
+    def show_grid(self):
+        # TODO: melhorar algoritmo de mostrar usuários conectados e não conectados,
+        # calcular e ordenar por music_match
+        self.ids.connections_grid.clear_widgets()
+        if self.showing_users_connected:
+            for connection in self.connected:
+                self.add_connection_banner(connection, "connected")
+        else:
+            for connection in self.not_connected:
+                self.add_connection_banner(connection, "not_connected")
+
+    def switch_users_view(self):
+        self.showing_users_connected = not self.showing_users_connected
+        self.show_grid()
+
+    def show_users_search(self):
+        self.ids.search_bar.size_hint_y = 0.1
+        self.ids.search_bar.height = 50
+        self.ids.search_bar.opacity = 1
+        self.ids.search_bar.disabled = False
+        self.ids.search_bar.focus = True
+
+    def search_user(self):
+        pass
 
     ############################## Tela de Perfil ##############################
 
