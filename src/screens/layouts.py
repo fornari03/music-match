@@ -72,6 +72,7 @@ MDScreenManager:
 <HomeScreen>:
     name: "home_screen"
     MDBottomNavigation:
+        id: home_screen_bottom_nav
         MDBottomNavigationItem:
             name: 'inicio'
             text: 'Início'
@@ -218,13 +219,25 @@ MDScreenManager:
                         pos_hint: {"center_x": 0.85}
                     MDLabel:
                         text: "" # gambiarra total para ajustar o layout
-                MDRaisedButton:
-                    text: "Salvar"
-                    md_bg_color: (0.31, 0.78, 0.47, 1)
-                    size_hint_x: None
-                    width: 300
-                    pos_hint: {"center_x": 0.5}
-                    on_release: root.save()
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(180)
+                    padding: [dp(200), dp(30), dp(200), dp(20)]
+                    pos_hint: {"center_y": 0.5}
+                    MDRaisedButton:
+                        text: "Salvar"
+                        md_bg_color: (0.31, 0.78, 0.47, 1)
+                        size_hint_x: None
+                        width: 300
+                        pos_hint: {"center_x": 0.5}
+                        on_release: root.save()
+                    MDRaisedButton:
+                        text: "Excluir conta"
+                        md_bg_color: (1, 0, 0, 1)
+                        size_hint_x: None
+                        width: 300
+                        pos_hint: {"center_x": 0.5}
+                        on_release: root.delete_account()
 
 
 <SignUpScreen>:
@@ -278,13 +291,6 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
-
-        MDRaisedButton:
-            text: "Adicionar Foto de Perfil"
-            md_bg_color: (1, 0, 1, 1)
-            size_hint_x: 0.3
-            pos_hint: {"center_x": 0.5}
-            on_release: root.set_profile_pic()
 
         MDRaisedButton:
             text: "Cadastrar"

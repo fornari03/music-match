@@ -28,23 +28,22 @@ class HomeScreen(MDScreen):
         # TODO: implementar lógica de receber os usuários conectados com a API do backend
         # TODO: implementar lógica de receber os usuários não conectados com a API do backend
 
-        musics_example = [
+        self.musics = [
             {"id": 1, "capa": "https://via.placeholder.com/150", "titulo": "musica 1", "artista": "artista 1", "genero": "MPB", "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
             {"id": 2, "capa": "https://via.placeholder.com/150", "titulo": "musica 2", "artista": "artista 2", "genero": "Pop", "spotify_link": "https://open.spotify.com"},
             {"id": 3, "capa": "https://via.placeholder.com/150", "titulo": "musica 3", "artista": "artista 3", "genero": "Rock", "spotify_link": "https://open.spotify.com"},
         ]
-        
-        for music in musics_example:
-            self.add_music_item(music)
+
+        self.show_music_list()
 
         self.connected = [
-            {"id": 2, "name": "João Silva", "social_media": ["Instagram: @joaosilva", "Twitter: @jsilva12", "Facebook: /joaosilvaa"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 87},
-            {"id": 3, "name": "Maria Souza", "social_media": ["Twitter: @mariasouza"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 75},
-            {"id": 4, "name": "Pedro Oliveira", "social_media": ["Facebook: /pedro.oliveira"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 65}
+            {"id": 2, "name": "João Silva", "social_media": ["Instagram: @joaosilva", "Twitter: @jsilva12", "Facebook: /joaosilvaa"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 87, "artists": ["artista 1", "artista 2", "artista 3"]},
+            {"id": 3, "name": "Maria Souza", "social_media": ["Twitter: @mariasouza"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 75, "artists": ["artista 1", "artista 2", "artista 3"]},
+            {"id": 4, "name": "Pedro Oliveira", "social_media": ["Facebook: /pedro.oliveira"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 65, "artists": ["artista 1", "artista 2", "artista 3"]},
         ]
 
         self.not_connected = [
-            {"id": 5, "name": "Henrique Vale", "social_media": ["Facebook: /h.valee"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 12}
+            {"id": 5, "name": "Henrique Vale", "social_media": ["Facebook: /h.valee"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 12, "artists": ["artista 1", "artista 2", "artista 3"]},
         ]
         self.show_grid()
 
@@ -91,6 +90,11 @@ class HomeScreen(MDScreen):
         like_icon.icon = "thumb-up-outline"
         # TODO: implementar lógica de avaliação com a API do backend
 
+    def show_music_list(self):
+        self.ids.music_list.clear_widgets()
+        for music in self.musics:
+            self.add_music_item(music)
+
 
     ############################## Tela de Eventos ##############################
 
@@ -107,6 +111,8 @@ class HomeScreen(MDScreen):
         box_layout.add_widget(MDLabel(text="    //    ".join(connection['social_media']), size_hint=(0.9, 0.2)))
 
         box_layout.add_widget(MDLabel(text=f"Gosto musical: {', '.join([': '.join([genero, str(perc)+'%']) for [genero, perc] in connection['musical_taste']])}", size_hint=(0.9, 0.1)))
+
+        box_layout.add_widget(MDLabel(text=f"Artistas: {', '.join(connection['artists'])}", size_hint=(0.9, 0.2)))
 
         box_layout.add_widget(MDLabel(text=f"Music Match: {connection['music_match']}%", size_hint=(0.3, 0.1)))
 
@@ -263,6 +269,41 @@ class HomeScreen(MDScreen):
         lista_redes_sociais = [(child.children[0].hint_text.strip(), child.children[0].text.strip()) for child in self.ids.lista_opcoes.children if child.children[1].active and child.children[0].text.strip() != ""] # lista de tuplas (nome_rede_social, usuario) habilitados e preenchidos
         # TODO: implementar lógica de edição dos dados com o API do backend
         pass
+
+    def delete_account(self):
+        self.dialog = MDDialog(
+            text="Deseja excluir sua conta?",
+            buttons=[
+                MDFlatButton(
+                    text="Cancelar",
+                    theme_text_color="Custom",
+                    text_color=self.theme_cls.primary_color,
+                    on_release=lambda x: self.dialog.dismiss()
+                ),
+                MDFlatButton(
+                    text="Excluir",
+                    theme_text_color="Custom",
+                    text_color=self.theme_cls.primary_color,
+                    on_release=lambda x: self.confirm_delete())]
+        )
+        self.dialog.open()
+
+    def confirm_delete(self):
+        self.dialog.dismiss()
+        self.dialog = MDDialog(
+            text="Conta excluída com sucesso!",
+            buttons=[
+                MDFlatButton(
+                    text="Ok",
+                    theme_text_color="Custom",
+                    text_color=self.theme_cls.primary_color,
+                    on_release=lambda x: self.dialog.dismiss()
+                )]
+        )
+        self.dialog.open()
+        self.ids.home_screen_bottom_nav.switch_tab("inicio")
+        self.manager.current = "login_screen"
+        # TODO: implementar lógica de exclusão de conta com o API do backend
 
     def set_profile_pic(self):
         # TODO: possibilitar abrir arquivos de imagem do dispositivo
