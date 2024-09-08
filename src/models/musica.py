@@ -1,4 +1,5 @@
 from ..services.connect import DBConnection
+from ..models.artista import Artista
 
 class Musica:
 
@@ -68,7 +69,12 @@ class Musica:
             
         return obj
 
+    # esta retornando uma lista de tuplas em que o primeiro elemento da tupla eh o nome do artista
     @staticmethod
-    def getArtists(idMusic: int):
-        #TODO
-        pass
+    def getArtistsName(idMusic: int):
+        sql = f"SELECT a.nome FROM artista a JOIN artista_tem_musica atm ON a.id=atm.id_artista WHERE atm.id_musica={idMusic}"
+
+        query_ans = DBConnection.query(sql, True)
+        if query_ans == -1:
+            return False
+        return query_ans
