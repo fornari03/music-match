@@ -41,7 +41,7 @@ class HomeScreen(MDScreen):
             {"id": 3, "capa": "https://via.placeholder.com/150", "titulo": "musica 3", "artista": "artista 3", "genero": "Rock", "spotify_link": "https://open.spotify.com"},
         ]
 
-        self.changed_evaluation = []       # lista de música que sofreram alteração na avaliação no formato ('CHAR_AVALIACAO', id_musica)
+        self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
 
         self.show_music_list()
 
@@ -66,10 +66,10 @@ class HomeScreen(MDScreen):
 
         dislike_icon = IconRightWidget(icon="thumb-down-outline")
 
-        like_icon.on_release = lambda: self.like_music(like_icon, dislike_icon)
+        like_icon.on_release = lambda: self.like_music(like_icon, dislike_icon, music['id'])
         item.add_widget(like_icon)
         
-        dislike_icon.on_release = lambda: self.dislike_music(dislike_icon, like_icon)
+        dislike_icon.on_release = lambda: self.dislike_music(dislike_icon, like_icon, music['id'])
         item.add_widget(dislike_icon)
 
         self.music_icons[music['id']] = {
@@ -83,21 +83,24 @@ class HomeScreen(MDScreen):
         self.ids.music_list.add_widget(item)
 
 
-    def like_music(self, like_icon, dislike_icon):
+    def like_music(self, like_icon, dislike_icon, music_id):
         if like_icon.icon == "thumb-up":
             like_icon.icon = "thumb-up-outline"
+            self.changed_evaluation[music_id] = 'N'
         else:
             like_icon.icon = "thumb-up"
+            self.changed_evaluation[music_id] = 'L'
         dislike_icon.icon = "thumb-down-outline"
-        # TODO: implementar lógica de avaliação com a API do backend
 
-    def dislike_music(self, dislike_icon, like_icon):
+    def dislike_music(self, dislike_icon, like_icon, music_id):
         if dislike_icon.icon == "thumb-down":
             dislike_icon.icon = "thumb-down-outline"
+            self.changed_evaluation[music_id] = 'N'
         else:
             dislike_icon.icon = "thumb-down"
+            self.changed_evaluation[music_id] = 'D'
         like_icon.icon = "thumb-up-outline"
-        # TODO: implementar lógica de avaliação com a API do backend
+
 
     def show_music_list(self, search_string=None):
         self.ids.music_list.clear_widgets()
@@ -134,6 +137,33 @@ class HomeScreen(MDScreen):
     def search_music(self, search_string):
         self.show_music_list(search_string)
         self.dialog.dismiss()
+
+    def save_evaluations(self):
+        # TODO: ver se vale a pena verificar se houve alguma alteração de fato
+        self.dialog = MDDialog(
+            text="Salvar avaliações?",
+            buttons=[
+                MDFlatButton(
+                    text="Cancelar",
+                    theme_text_color="Custom",
+                    text_color=self.theme_cls.primary_color,
+                    on_release=lambda x: self.dialog.dismiss()
+                ),
+                MDFlatButton(
+                    text="Salvar",
+                    theme_text_color="Custom",
+                    text_color=self.theme_cls.primary_color,
+                    on_release=lambda x: self.confirm_save())]
+        )
+        self.dialog.open()
+
+    def confirm_save(self):
+        # TODO: implementar lógica de salvar alterações das avaliações com o API do backend
+        # TODO: bloquear a interface por um tempo até receber tudo do banco de dados de novo
+        self.dialog.dismiss()
+        self.show_music_list()
+        print(self.changed_evaluation)      # dicionario com alterações de avaliação no formato id_musica: 'CHAR_AVALIAÇÃO'
+
 
     ############################## Tela de Eventos ##############################
 

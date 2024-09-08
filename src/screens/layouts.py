@@ -79,7 +79,7 @@ MDScreenManager:
             icon: 'music-circle'
             MDBoxLayout:
                 orientation: 'vertical'
-                padding: dp(0)
+                padding: [0,0,0,10]
                 MDTopAppBar:
                     title: "Músicas"
                     md_bg_color: (1, 0, 1, 1)
@@ -88,6 +88,14 @@ MDScreenManager:
                 MDScrollView:
                     MDList:
                         id: music_list
+                MDRaisedButton:
+                    text: "Salvar"
+                    md_bg_color: (0.31, 0.78, 0.47, 1)
+                    size_hint_x: None
+                    width: 300
+                    pos_hint: {"center_x": 0.5}
+                    on_release: root.save_evaluations()
+                    
 
         MDBottomNavigationItem:
             name: 'eventos'
