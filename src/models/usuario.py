@@ -116,7 +116,9 @@ class Usuario:
             return False
         return True
     
-    # metodos CRUD pra rede social do usuario de email dado
+    # metodos CRUD pra rede social do usuario de email dado lembrando que o email eh unico para cada usuario
+    # socMed = qual a rede Social
+    # userSocMed = usuario naquela rede social
 
     @staticmethod
     def findSocialMedia(email: str):
@@ -125,7 +127,7 @@ class Usuario:
         if user == False:
             return False
 
-        idUser = user[0][0]
+        idUser = user[0].id
 
         sql = f"SELECT rede_social, usuario_rede_social FROM redes_sociais WHERE id_usuario={idUser}"
 
@@ -141,7 +143,7 @@ class Usuario:
         if user == False:
             return False
 
-        idUser = user[0][0]
+        idUser = user[0].id
 
         sql = f"INSERT INTO redes_sociais(id_usuario, rede_social, usuario_rede_social) VALUES ({idUser}, {socMed}, {userSocMed})"
 
@@ -156,7 +158,7 @@ class Usuario:
         if user == False:
             return False
 
-        idUser = user[0][0]
+        idUser = user[0].id
 
         sql = f"UPDATE redes_sociais SET usuario_rede_social={userSocMed} WHERE id_usuario={idUser} AND rede_social={socMed}"
         if DBConnection.query(sql, False) == -1:
@@ -170,7 +172,7 @@ class Usuario:
         if user == False:
             return False
 
-        idUser = user[0][0]
+        idUser = user[0].id
 
         sql = f"DELETE FROM redes_sociais WHERE id_usuario={idUser} AND rede_social={socMed}"
         if DBConnection.query(sql, False) == -1:
