@@ -55,7 +55,7 @@ class Usuario:
         else:
             sql = f"UPDATE usuario SET nome={self.nome}, email={self.email}, senha={self.senha}, data_nascimento={self.data_nascimento}, foto_perfil={self.foto_perfil} WHERE id={self.id}"
 
-        if DBConnection.query(sql, False):
+        if DBConnection.query(sql, False) == -1:
             return False
         
         self.__setIsNew(False)
@@ -115,3 +115,22 @@ class Usuario:
         if query == -1:
             return False
         return True
+    
+    # metodos CRUD pra rede social do usuario de email dado
+
+    @staticmethod
+    def findSocialMedia(email: str):
+        user = Usuario.where({"email": email})
+
+        if user == False:
+            return False
+
+        idUser = user[0][0]
+
+        sql = f"SELECT rede_social, usuario_rede_social FROM redes_sociais WHERE id_usuario={idUser}"
+
+        data = DBConnection.query(sql, True)
+        if data == -1:
+            return False
+        return data    
+    
