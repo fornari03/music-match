@@ -263,7 +263,8 @@ class HomeScreen(MDScreen):
                     self.add_connection_banner(connection, "connected")
         else:
             for connection in self.not_connected:
-                self.add_connection_banner(connection, "not_connected")
+                if search_string is None or search_string.lower().strip() in connection['name'].lower().strip() or search_string.lower().strip() in connection['social_media'] or search_string.lower().strip() == "":
+                    self.add_connection_banner(connection, "not_connected")
 
     def switch_users_view(self):
         self.showing_users_connected = not self.showing_users_connected
