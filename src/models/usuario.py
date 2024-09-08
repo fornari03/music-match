@@ -196,13 +196,14 @@ class Usuario:
         idUser1 = user1[0].id
         idUser2 = user2[0].id
 
-        sql = f"INSERT INTO conecta_com (id_usuario1, id_usuario2) VALUES ({idUser1}, {idUser2})"
+        sql = f"INSERT INTO conecta_com (id_usuario_1, id_usuario_2) VALUES ({idUser1}, {idUser2})"
         if DBConnection.query(sql, False) == -1:
             return False
         return True
     
     # metodo que remove a relacao entre dois usuarios
-    def connect(email1: str, email2: str):
+    @staticmethod
+    def disconnect(email1: str, email2: str):
         user1 = Usuario.where({"email": email1})
         user2 = Usuario.where({"email": email2})
 
@@ -212,7 +213,7 @@ class Usuario:
         idUser1 = user1[0].id
         idUser2 = user2[0].id
 
-        sql = f"DELETE FROM conecta_com WHERE (id_usuario1={idUser1} OR id_usuario1={idUser2}) AND (id_usuario2={idUser1} OR id_usuario2={idUser2})"
+        sql = f"DELETE FROM conecta_com WHERE (id_usuario_1={idUser1} OR id_usuario_1={idUser2}) AND (id_usuario_2={idUser1} OR id_usuario_2={idUser2})"
         if DBConnection.query(sql, False) == -1:
             return False
         return True
@@ -228,7 +229,7 @@ class Usuario:
 
         idUser = user[0].id
 
-        sql = f"SELECT * FROM conecta_com WHERE id_usuario1={idUser} OR id_usuario2={idUser}"
+        sql = f"SELECT * FROM conecta_com WHERE id_usuario_1={idUser} OR id_usuario_2={idUser}"
         
         query_ret = DBConnection.query(sql, True)
         if query_ret == -1:
