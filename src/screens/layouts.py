@@ -139,9 +139,9 @@ MDScreenManager:
                     MDGridLayout:
                         id: connections_grid
                         cols: 1
-                        row_default_height: dp(150)
+                        row_default_height: dp(160)
                         row_force_default: True
-                        spacing: dp(80)
+                        spacing: dp(60)
                         padding: dp(50)
                         size_hint_y: None
                         height: self.minimum_height
