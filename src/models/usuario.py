@@ -159,3 +159,20 @@ class Usuario:
         idUser = user[0][0]
 
         sql = f"UPDATE redes_sociais SET usuario_rede_social={userSocMed} WHERE id_usuario={idUser} AND rede_social={socMed}"
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
+    
+    @staticmethod
+    def deleteSocialMedia(email: str, socMed: str):
+        user = Usuario.where({"email": email})
+
+        if user == False:
+            return False
+
+        idUser = user[0][0]
+
+        sql = f"DELETE FROM redes_sociais WHERE id_usuario={idUser} AND rede_social={socMed}"
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
