@@ -1,5 +1,5 @@
 import psycopg2
-from config import load_config
+from ..services.config import load_config
 
 class DBConnection:
 
