@@ -55,7 +55,7 @@ class Usuario:
         else:
             sql = f"UPDATE usuario SET nome={self.nome}, email={self.email}, senha={self.senha}, data_nascimento={self.data_nascimento}, foto_perfil={self.foto_perfil} WHERE id={self.id}"
 
-        if DBConnection.query(sql, False):
+        if DBConnection.query(sql, False) == -1:
             return False
         
         self.__setIsNew(False)
@@ -115,3 +115,131 @@ class Usuario:
         if query == -1:
             return False
         return True
+    
+    # metodos CRUD pra rede social do usuario de email dado lembrando que o email eh unico para cada usuario
+    # socMed = qual a rede Social
+    # userSocMed = usuario naquela rede social
+
+    @staticmethod
+    def findSocialMedia(email: str):
+        user = Usuario.where({"email": email})
+
+        if user == False:
+            return False
+
+        idUser = user[0].id
+
+        sql = f"SELECT rede_social, usuario_rede_social FROM redes_sociais WHERE id_usuario={idUser}"
+
+        data = DBConnection.query(sql, True)
+        if data == -1:
+            return False
+        return data    
+    
+    @staticmethod
+    def addSocialMedia(email: str, socMed: str, userSocMed: str):
+        user = Usuario.where({"email": email})
+
+        if user == False:
+            return False
+
+        idUser = user[0].id
+
+        sql = f"INSERT INTO redes_sociais(id_usuario, rede_social, usuario_rede_social) VALUES ({idUser}, {socMed}, {userSocMed})"
+
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
+    
+    @staticmethod
+    def editSocialMediaUsername(email: str, socMed: str, userSocMed: str):
+        user = Usuario.where({"email": email})
+
+        if user == False:
+            return False
+
+        idUser = user[0].id
+
+        sql = f"UPDATE redes_sociais SET usuario_rede_social={userSocMed} WHERE id_usuario={idUser} AND rede_social={socMed}"
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
+    
+    @staticmethod
+    def deleteSocialMedia(email: str, socMed: str):
+        user = Usuario.where({"email": email})
+
+        if user == False:
+            return False
+
+        idUser = user[0].id
+
+        sql = f"DELETE FROM redes_sociais WHERE id_usuario={idUser} AND rede_social={socMed}"
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
+    
+    # metodo que cria uma relacao indicando que dois usuarios se conectaram, passando o email dos 2
+    # (a gente pode mudar pra id, dependendo de como ficar la no front)
+    @staticmethod
+    def connect(email1: str, email2: str):
+        # nao deixa conectar consigo msm
+        if (email1 == email2):
+            return False        
+
+        user1 = Usuario.where({"email": email1})
+        user2 = Usuario.where({"email": email2})
+
+        if user1 == False or user2 == False:
+            return False
+
+        idUser1 = user1[0].id
+        idUser2 = user2[0].id
+
+        sql = f"INSERT INTO conecta_com (id_usuario_1, id_usuario_2) VALUES ({idUser1}, {idUser2})"
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
+    
+    # metodo que remove a relacao entre dois usuarios
+    @staticmethod
+    def disconnect(email1: str, email2: str):
+        user1 = Usuario.where({"email": email1})
+        user2 = Usuario.where({"email": email2})
+
+        if user1 == False or user2 == False:
+            return False
+
+        idUser1 = user1[0].id
+        idUser2 = user2[0].id
+
+        sql = f"DELETE FROM conecta_com WHERE (id_usuario_1={idUser1} OR id_usuario_1={idUser2}) AND (id_usuario_2={idUser1} OR id_usuario_2={idUser2})"
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
+    
+    # encontra as conexoes de um usuario
+    # da pra gente fazer um join table pra gente retornar os emails, mas por enquanto so retorna os ids
+    @staticmethod
+    def findConnections(email: str):
+        user = Usuario.where({"email": email})
+
+        if user == False:
+            return False
+
+        idUser = user[0].id
+
+        sql = f"SELECT * FROM conecta_com WHERE id_usuario_1={idUser} OR id_usuario_2={idUser}"
+        
+        query_ret = DBConnection.query(sql, True)
+        if query_ret == -1:
+            return False
+        
+        otherUserIds = []
+        for inst in query_ret:
+            if inst[0] == idUser:
+                otherUserIds.append(inst[1])
+            else:
+                otherUserIds.append(inst[0])
+        
+        return otherUserIds
