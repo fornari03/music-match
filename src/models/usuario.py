@@ -216,3 +216,29 @@ class Usuario:
         if DBConnection.query(sql, False) == -1:
             return False
         return True
+    
+    # encontra as conexoes de um usuario
+    # da pra gente fazer um join table pra gente retornar os emails, mas por enquanto so retorna os ids
+    @staticmethod
+    def findConnections(email: str):
+        user = Usuario.where({"email": email})
+
+        if user == False:
+            return False
+
+        idUser = user[0].id
+
+        sql = f"SELECT * FROM conecta_com WHERE id_usuario1={idUser} OR id_usuario2={idUser}"
+        
+        query_ret = DBConnection.query(sql, True)
+        if query_ret == -1:
+            return False
+        
+        otherUserIds = []
+        for inst in query_ret:
+            if inst[0] == idUser:
+                otherUserIds.append(inst[1])
+            else:
+                otherUserIds.append(inst[0])
+        
+        return otherUserIds
