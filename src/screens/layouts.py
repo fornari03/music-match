@@ -92,9 +92,26 @@ MDScreenManager:
             name: 'conexoes'
             text: 'Conexões'
             icon: 'account-group'
-            MDLabel:
-                text: "Conexões"
-                halign: "center"
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: dp(0)
+                MDTopAppBar:
+                    title: "Conexões"
+                    md_bg_color: (1, 0, 1, 1)
+                    left_action_items: [["order-bool-ascending", lambda x: root.switch_users_view()]]
+                    right_action_items: [["magnify", lambda x: root.show_users_search()]]
+
+                MDScrollView:
+                    MDGridLayout:
+                        id: connections_grid
+                        cols: 1
+                        row_default_height: dp(150)
+                        row_force_default: True
+                        spacing: dp(80)
+                        padding: dp(50)
+                        size_hint_y: None
+                        height: self.minimum_height
+                        adaptive_height: True
 
         MDBottomNavigationItem:
             name: 'perfil'
