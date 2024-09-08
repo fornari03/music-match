@@ -38,5 +38,30 @@ class Artista:
 
     @staticmethod
     def where(data: dict):
-        #TODO
-        pass
+        sql = "SELECT id, nome, foto FROM artista"
+
+        if len(data.keys()) != 0:
+            key0 = next(iter(data))
+            sql += f" WHERE {key0}={data[key0]}"
+
+            for key in data:
+                if key == key0:
+                    continue
+                
+                sql += f" AND {key}={data[key]}"
+        
+        lines = DBConnection.query(sql, True)
+
+        if lines == -1:
+            return False
+
+        obj = []
+        for inst in lines:
+            new_obj = Artista()
+            new_obj.__isNew = False
+            read_data = {"id": inst[0], "nome": inst[1], "foto": inst[2]}
+            new_obj.change_values(read_data)
+
+            obj.append(new_obj)
+            
+        return obj
