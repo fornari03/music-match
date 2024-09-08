@@ -30,15 +30,15 @@ class HomeScreen(MDScreen):
         # TODO: implementar lógica de receber os usuários não conectados com a API do backend
 
         self.evaluated = [
-            {"id": 4, "capa": "https://via.placeholder.com/150", "titulo": "musica 4", "artista": "artista 4", "genero": "MPB", "spotify_link": "https://open.spotify.com"},
-            {"id": 5, "capa": "https://via.placeholder.com/150", "titulo": "musica 5", "artista": "artista 5", "genero": "Pop", "spotify_link": "https://open.spotify.com"},
-            {"id": 6, "capa": "https://via.placeholder.com/150", "titulo": "musica 6", "artista": "artista 6", "genero": "Rock", "spotify_link": "https://open.spotify.com"},
+            {"id": 4, "capa": "https://via.placeholder.com/150", "titulo": "musica 4", "artista": ["artista 4"], "genero": ["MPB"], "spotify_link": "https://open.spotify.com", "evaluation": "L"},
+            {"id": 5, "capa": "https://via.placeholder.com/150", "titulo": "musica 5", "artista": ["artista 5"], "genero": ["Pop"], "spotify_link": "https://open.spotify.com", "evaluation": "L"},
+            {"id": 6, "capa": "https://via.placeholder.com/150", "titulo": "musica 6", "artista": ["artista 6"], "genero": ["Rock"], "spotify_link": "https://open.spotify.com", "evaluation": "D"},
         ]
 
         self.not_evaluated = [
-            {"id": 1, "capa": "https://via.placeholder.com/150", "titulo": "musica 1", "artista": "artista 1", "genero": "MPB", "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
-            {"id": 2, "capa": "https://via.placeholder.com/150", "titulo": "musica 2", "artista": "artista 2", "genero": "Pop", "spotify_link": "https://open.spotify.com"},
-            {"id": 3, "capa": "https://via.placeholder.com/150", "titulo": "musica 3", "artista": "artista 3", "genero": "Rock", "spotify_link": "https://open.spotify.com"},
+            {"id": 1, "capa": "https://via.placeholder.com/150", "titulo": "Ainda Gosto Dela", "artista": ["Skank"], "genero": ["MPB"], "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
+            {"id": 2, "capa": "https://via.placeholder.com/150", "titulo": "musica 2", "artista": ["artista 2"], "genero": ["Pop"], "spotify_link": "https://open.spotify.com"},
+            {"id": 3, "capa": "https://via.placeholder.com/150", "titulo": "musica 3", "artista": ["artista 3"], "genero": ["Rock"], "spotify_link": "https://open.spotify.com"},
         ]
 
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
@@ -57,14 +57,20 @@ class HomeScreen(MDScreen):
         self.show_grid()
 
     def add_music_item(self, music):
-        item = TwoLineAvatarIconListItem(text=f"{music['titulo']} - {music['genero']}", secondary_text=f"{music['artista']}")
+        item = TwoLineAvatarIconListItem(text=f"{music['titulo']} - {', '.join(music['genero'])}", secondary_text=f"{', '.join(music['artista'])}")
         
         capa = ImageLeftWidget(source=music['capa'])
         item.add_widget(capa)
         
-        like_icon = IconRightWidget(icon="thumb-up-outline")
-
-        dislike_icon = IconRightWidget(icon="thumb-down-outline")
+        if music.get("evaluation") == 'L' or (music['id'], 'L') in self.changed_evaluation.items():
+            like_icon = IconRightWidget(icon="thumb-up")
+            dislike_icon = IconRightWidget(icon="thumb-down-outline")
+        elif music.get("evaluation") == 'D' or (music['id'], 'D') in self.changed_evaluation.items():
+            like_icon = IconRightWidget(icon="thumb-up-outline")
+            dislike_icon = IconRightWidget(icon="thumb-down")
+        else:
+            like_icon = IconRightWidget(icon="thumb-up-outline")
+            dislike_icon = IconRightWidget(icon="thumb-down-outline")
 
         like_icon.on_release = lambda: self.like_music(like_icon, dislike_icon, music['id'])
         item.add_widget(like_icon)
@@ -106,12 +112,12 @@ class HomeScreen(MDScreen):
         self.ids.music_list.clear_widgets()
         if not self.showing_evaluated_musics:
             for music in self.not_evaluated:
-                if search_string is None or search_string.lower().strip() in music['titulo'].lower().strip() or search_string.lower().strip() in music['artista'] or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
+                if search_string is None or search_string.lower().strip() in music['titulo'].lower().strip() or search_string.lower().strip() in " ".join(music['artista']).lower().strip() or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
                     self.add_music_item(music)
 
         else:
             for music in self.evaluated:
-                if search_string is None or search_string.lower().strip() in music['titulo'].lower().strip() or search_string.lower().strip() in music['artista'] or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
+                if search_string is None or search_string.lower().strip() in music['titulo'].lower().strip() or search_string.lower().strip() in " ".join(music['artista']).lower().strip() or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
                     self.add_music_item(music)
 
     def switch_musics_view(self):
