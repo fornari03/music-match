@@ -77,9 +77,17 @@ MDScreenManager:
             name: 'inicio'
             text: 'Início'
             icon: 'music-circle'
-            MDScrollView:
-                MDList:
-                    id: music_list
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: dp(0)
+                MDTopAppBar:
+                    title: "Músicas"
+                    md_bg_color: (1, 0, 1, 1)
+                    left_action_items: [["order-bool-ascending", lambda x: root.switch_musics_view()]]
+                    right_action_items: [["magnify", lambda x: root.show_musics_search()]]
+                MDScrollView:
+                    MDList:
+                        id: music_list
 
         MDBottomNavigationItem:
             name: 'eventos'

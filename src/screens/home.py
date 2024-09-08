@@ -18,6 +18,7 @@ class HomeScreen(MDScreen):
         super().__init__(**kwargs)
         self.music_icons = {}
         self.showing_users_connected = True
+        self.showing_evaluated_musics = True
 
     ############################## Tela de Início ##############################
 
@@ -28,11 +29,19 @@ class HomeScreen(MDScreen):
         # TODO: implementar lógica de receber os usuários conectados com a API do backend
         # TODO: implementar lógica de receber os usuários não conectados com a API do backend
 
-        self.musics = [
+        self.evaluated = [
+            {"id": 4, "capa": "https://via.placeholder.com/150", "titulo": "musica 4", "artista": "artista 4", "genero": "MPB", "spotify_link": "https://open.spotify.com"},
+            {"id": 5, "capa": "https://via.placeholder.com/150", "titulo": "musica 5", "artista": "artista 5", "genero": "Pop", "spotify_link": "https://open.spotify.com"},
+            {"id": 6, "capa": "https://via.placeholder.com/150", "titulo": "musica 6", "artista": "artista 6", "genero": "Rock", "spotify_link": "https://open.spotify.com"},
+        ]
+
+        self.not_evaluated = [
             {"id": 1, "capa": "https://via.placeholder.com/150", "titulo": "musica 1", "artista": "artista 1", "genero": "MPB", "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
             {"id": 2, "capa": "https://via.placeholder.com/150", "titulo": "musica 2", "artista": "artista 2", "genero": "Pop", "spotify_link": "https://open.spotify.com"},
             {"id": 3, "capa": "https://via.placeholder.com/150", "titulo": "musica 3", "artista": "artista 3", "genero": "Rock", "spotify_link": "https://open.spotify.com"},
         ]
+
+        self.changed_evaluation = []       # lista de música que sofreram alteração na avaliação no formato ('CHAR_AVALIACAO', id_musica)
 
         self.show_music_list()
 
@@ -90,11 +99,41 @@ class HomeScreen(MDScreen):
         like_icon.icon = "thumb-up-outline"
         # TODO: implementar lógica de avaliação com a API do backend
 
-    def show_music_list(self):
+    def show_music_list(self, search_string=None):
         self.ids.music_list.clear_widgets()
-        for music in self.musics:
-            self.add_music_item(music)
+        if not self.showing_evaluated_musics:
+            for music in self.not_evaluated:
+                if search_string is None or search_string.lower().strip() in music['titulo'].lower().strip() or search_string.lower().strip() in music['artista'] or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
+                    self.add_music_item(music)
 
+        else:
+            for music in self.evaluated:
+                if search_string is None or search_string.lower().strip() in music['titulo'].lower().strip() or search_string.lower().strip() in music['artista'] or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
+                    self.add_music_item(music)
+
+    def switch_musics_view(self):
+        self.showing_evaluated_musics = not self.showing_evaluated_musics
+        self.show_music_list()
+
+    def show_musics_search(self):
+        self.dialog = MDDialog(
+            title="Buscar Música",
+            type="custom",
+            content_cls=
+                MDBoxLayout(
+                    MDTextField(id="barra_pesquisa", hint_text="Nome da Música"),
+                    MDRaisedButton(text="Buscar", on_release=lambda x: self.search_music(self.dialog.content_cls.children[1].text.strip())),
+                    orientation="vertical",
+                    spacing="12dp",
+                    size_hint_y=None,
+                    height="120dp"
+                )        
+        )
+        self.dialog.open()
+
+    def search_music(self, search_string):
+        self.show_music_list(search_string)
+        self.dialog.dismiss()
 
     ############################## Tela de Eventos ##############################
 
