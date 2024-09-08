@@ -77,9 +77,25 @@ MDScreenManager:
             name: 'inicio'
             text: 'Início'
             icon: 'music-circle'
-            MDScrollView:
-                MDList:
-                    id: music_list
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: [0,0,0,10]
+                MDTopAppBar:
+                    title: "Músicas"
+                    md_bg_color: (1, 0, 1, 1)
+                    left_action_items: [["order-bool-ascending", lambda x: root.switch_musics_view()]]
+                    right_action_items: [["magnify", lambda x: root.show_musics_search()]]
+                MDScrollView:
+                    MDList:
+                        id: music_list
+                MDRaisedButton:
+                    text: "Salvar"
+                    md_bg_color: (0.31, 0.78, 0.47, 1)
+                    size_hint_x: None
+                    width: 300
+                    pos_hint: {"center_x": 0.5}
+                    on_release: root.save_evaluations()
+                    
 
         MDBottomNavigationItem:
             name: 'eventos'

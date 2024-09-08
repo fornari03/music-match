@@ -18,6 +18,7 @@ class HomeScreen(MDScreen):
         super().__init__(**kwargs)
         self.music_icons = {}
         self.showing_users_connected = True
+        self.showing_evaluated_musics = True
 
     ############################## Tela de Início ##############################
 
@@ -28,11 +29,19 @@ class HomeScreen(MDScreen):
         # TODO: implementar lógica de receber os usuários conectados com a API do backend
         # TODO: implementar lógica de receber os usuários não conectados com a API do backend
 
-        self.musics = [
-            {"id": 1, "capa": "https://via.placeholder.com/150", "titulo": "musica 1", "artista": "artista 1", "genero": "MPB", "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
-            {"id": 2, "capa": "https://via.placeholder.com/150", "titulo": "musica 2", "artista": "artista 2", "genero": "Pop", "spotify_link": "https://open.spotify.com"},
-            {"id": 3, "capa": "https://via.placeholder.com/150", "titulo": "musica 3", "artista": "artista 3", "genero": "Rock", "spotify_link": "https://open.spotify.com"},
+        self.evaluated = [
+            {"id": 4, "capa": "https://via.placeholder.com/150", "titulo": "musica 4", "artista": ["artista 4"], "genero": ["MPB"], "spotify_link": "https://open.spotify.com", "evaluation": "L"},
+            {"id": 5, "capa": "https://via.placeholder.com/150", "titulo": "musica 5", "artista": ["artista 5"], "genero": ["Pop"], "spotify_link": "https://open.spotify.com", "evaluation": "L"},
+            {"id": 6, "capa": "https://via.placeholder.com/150", "titulo": "musica 6", "artista": ["artista 6"], "genero": ["Rock"], "spotify_link": "https://open.spotify.com", "evaluation": "D"},
         ]
+
+        self.not_evaluated = [
+            {"id": 1, "capa": "https://via.placeholder.com/150", "titulo": "Ainda Gosto Dela", "artista": ["Skank"], "genero": ["MPB"], "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
+            {"id": 2, "capa": "https://via.placeholder.com/150", "titulo": "musica 2", "artista": ["artista 2"], "genero": ["Pop"], "spotify_link": "https://open.spotify.com"},
+            {"id": 3, "capa": "https://via.placeholder.com/150", "titulo": "musica 3", "artista": ["artista 3"], "genero": ["Rock"], "spotify_link": "https://open.spotify.com"},
+        ]
+
+        self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
 
         self.show_music_list()
 
@@ -48,19 +57,25 @@ class HomeScreen(MDScreen):
         self.show_grid()
 
     def add_music_item(self, music):
-        item = TwoLineAvatarIconListItem(text=f"{music['titulo']} - {music['genero']}", secondary_text=f"{music['artista']}")
+        item = TwoLineAvatarIconListItem(text=f"{music['titulo']} - {', '.join(music['genero'])}", secondary_text=f"{', '.join(music['artista'])}")
         
         capa = ImageLeftWidget(source=music['capa'])
         item.add_widget(capa)
         
-        like_icon = IconRightWidget(icon="thumb-up-outline")
+        if music.get("evaluation") == 'L' or (music['id'], 'L') in self.changed_evaluation.items():
+            like_icon = IconRightWidget(icon="thumb-up")
+            dislike_icon = IconRightWidget(icon="thumb-down-outline")
+        elif music.get("evaluation") == 'D' or (music['id'], 'D') in self.changed_evaluation.items():
+            like_icon = IconRightWidget(icon="thumb-up-outline")
+            dislike_icon = IconRightWidget(icon="thumb-down")
+        else:
+            like_icon = IconRightWidget(icon="thumb-up-outline")
+            dislike_icon = IconRightWidget(icon="thumb-down-outline")
 
-        dislike_icon = IconRightWidget(icon="thumb-down-outline")
-
-        like_icon.on_release = lambda: self.like_music(like_icon, dislike_icon)
+        like_icon.on_release = lambda: self.like_music(like_icon, dislike_icon, music['id'])
         item.add_widget(like_icon)
         
-        dislike_icon.on_release = lambda: self.dislike_music(dislike_icon, like_icon)
+        dislike_icon.on_release = lambda: self.dislike_music(dislike_icon, like_icon, music['id'])
         item.add_widget(dislike_icon)
 
         self.music_icons[music['id']] = {
@@ -74,26 +89,86 @@ class HomeScreen(MDScreen):
         self.ids.music_list.add_widget(item)
 
 
-    def like_music(self, like_icon, dislike_icon):
+    def like_music(self, like_icon, dislike_icon, music_id):
         if like_icon.icon == "thumb-up":
             like_icon.icon = "thumb-up-outline"
+            self.changed_evaluation[music_id] = 'N'
         else:
             like_icon.icon = "thumb-up"
+            self.changed_evaluation[music_id] = 'L'
         dislike_icon.icon = "thumb-down-outline"
-        # TODO: implementar lógica de avaliação com a API do backend
 
-    def dislike_music(self, dislike_icon, like_icon):
+    def dislike_music(self, dislike_icon, like_icon, music_id):
         if dislike_icon.icon == "thumb-down":
             dislike_icon.icon = "thumb-down-outline"
+            self.changed_evaluation[music_id] = 'N'
         else:
             dislike_icon.icon = "thumb-down"
+            self.changed_evaluation[music_id] = 'D'
         like_icon.icon = "thumb-up-outline"
-        # TODO: implementar lógica de avaliação com a API do backend
 
-    def show_music_list(self):
+
+    def show_music_list(self, search_string=None):
         self.ids.music_list.clear_widgets()
-        for music in self.musics:
-            self.add_music_item(music)
+        if not self.showing_evaluated_musics:
+            for music in self.not_evaluated:
+                if search_string is None or search_string.lower().strip() in music['titulo'].lower().strip() or search_string.lower().strip() in " ".join(music['artista']).lower().strip() or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
+                    self.add_music_item(music)
+
+        else:
+            for music in self.evaluated:
+                if search_string is None or search_string.lower().strip() in music['titulo'].lower().strip() or search_string.lower().strip() in " ".join(music['artista']).lower().strip() or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
+                    self.add_music_item(music)
+
+    def switch_musics_view(self):
+        self.showing_evaluated_musics = not self.showing_evaluated_musics
+        self.show_music_list()
+
+    def show_musics_search(self):
+        self.dialog = MDDialog(
+            title="Buscar Música",
+            type="custom",
+            content_cls=
+                MDBoxLayout(
+                    MDTextField(id="barra_pesquisa", hint_text="Nome da Música"),
+                    MDRaisedButton(text="Buscar", on_release=lambda x: self.search_music(self.dialog.content_cls.children[1].text.strip())),
+                    orientation="vertical",
+                    spacing="12dp",
+                    size_hint_y=None,
+                    height="120dp"
+                )        
+        )
+        self.dialog.open()
+
+    def search_music(self, search_string):
+        self.show_music_list(search_string)
+        self.dialog.dismiss()
+
+    def save_evaluations(self):
+        # TODO: ver se vale a pena verificar se houve alguma alteração de fato
+        self.dialog = MDDialog(
+            text="Salvar avaliações?",
+            buttons=[
+                MDFlatButton(
+                    text="Cancelar",
+                    theme_text_color="Custom",
+                    text_color=self.theme_cls.primary_color,
+                    on_release=lambda x: self.dialog.dismiss()
+                ),
+                MDFlatButton(
+                    text="Salvar",
+                    theme_text_color="Custom",
+                    text_color=self.theme_cls.primary_color,
+                    on_release=lambda x: self.confirm_save())]
+        )
+        self.dialog.open()
+
+    def confirm_save(self):
+        # TODO: implementar lógica de salvar alterações das avaliações com o API do backend
+        # TODO: bloquear a interface por um tempo até receber tudo do banco de dados de novo
+        self.dialog.dismiss()
+        self.show_music_list()
+        print(self.changed_evaluation)      # dicionario com alterações de avaliação no formato id_musica: 'CHAR_AVALIAÇÃO'
 
 
     ############################## Tela de Eventos ##############################
@@ -224,7 +299,8 @@ class HomeScreen(MDScreen):
                     self.add_connection_banner(connection, "connected")
         else:
             for connection in self.not_connected:
-                self.add_connection_banner(connection, "not_connected")
+                if search_string is None or search_string.lower().strip() in connection['name'].lower().strip() or search_string.lower().strip() in connection['social_media'] or search_string.lower().strip() == "":
+                    self.add_connection_banner(connection, "not_connected")
 
     def switch_users_view(self):
         self.showing_users_connected = not self.showing_users_connected
