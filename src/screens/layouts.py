@@ -280,13 +280,6 @@ MDScreenManager:
             pos_hint: {"center_x": 0.5}
 
         MDRaisedButton:
-            text: "Adicionar Foto de Perfil"
-            md_bg_color: (1, 0, 1, 1)
-            size_hint_x: 0.3
-            pos_hint: {"center_x": 0.5}
-            on_release: root.set_profile_pic()
-
-        MDRaisedButton:
             text: "Cadastrar"
             md_bg_color: (1, 0, 1, 1)
             size_hint_x: None
