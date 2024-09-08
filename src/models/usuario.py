@@ -134,3 +134,17 @@ class Usuario:
             return False
         return data    
     
+    @staticmethod
+    def addSocialMedia(email: str, socMed: str, userSocMed: str):
+        user = Usuario.where({"email": email})
+
+        if user == False:
+            return False
+
+        idUser = user[0][0]
+
+        sql = f"INSERT INTO redes_sociais(id_usuario, rede_social, usuario_rede_social) VALUES ({idUser}, {socMed}, {userSocMed})"
+
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
