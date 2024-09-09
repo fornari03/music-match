@@ -18,11 +18,14 @@ class Artista:
                 self.foto = data[key]
 
     # se eh uma nova instancia da problema do self.id nao ficar atualizado
+    # esses consertos podem dar muito problema se fizer SAVE 2 vezes seguidas
     def save(self):
         if self.id == None:
             self.id = "NULL"
         if self.nome == None:
             self.nome = "NULL"
+        elif self.nome[0] != "'" and self.nome[-1] != "'":
+            self.nome = f"'{self.nome}'"
         if self.foto == None:
             self.foto = "NULL"
 

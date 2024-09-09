@@ -17,6 +17,8 @@ class EstiloMusical:
     def save(self):
         if self.nome == None:
             self.nome = "NULL"
+        elif self.nome[0] != "'" and self.nome[-1] != "'":
+            self.nome = f"'{self.nome}'"
 
         if self.__isNew:
             sql = f"INSERT INTO estilo_musical (nome) VALUES ({self.nome})"
