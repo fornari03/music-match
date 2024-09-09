@@ -45,35 +45,12 @@ MDScreenManager:
         MDTextField:
             id: senha
             hint_text: "Senha"
-            icon_right: "eye-off"
+            icon_right: "lock"
             password: True
             mode: "rectangle"
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
-        MDBoxLayout:
-            size_hint: .85, None
-            height: "30dp"
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            MDCheckbox:
-                id: cb
-                size_hint: None, None
-                width: "30dp"
-                height: "30dp"
-                pos_hint: {'center_x':.5, 'center_y':.5}
-                on_press:
-                    senha.password = True if senha.password == False else False 
-                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
-            
-            MDLabel:
-                text: "[ref=Mostrar Senha]Mostrar Senha[/ref]"
-                markup: True
-                pos_hint: {'center_x':.5, 'center_y':.5}
-                on_ref_press:
-                    cb.active = True if cb.active == False else False
-                    senha.password = True if senha.password == False else False 
-                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
-
         MDRaisedButton:
             text: "Login"
             md_bg_color: (1, 0, 1, 1)
@@ -313,33 +290,20 @@ MDScreenManager:
         MDTextField:
             id: nome
             hint_text: "Nome"
-            max_text_length: 10
-            helper_text_mode: "on_error"
-            helper_text: "Máximo de 10 caracteres"
             icon_right: "account"
             mode: "rectangle"
             size_hint_x: None
             width: 300
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            on_text:
-                self.text = self.text.replace(" ", "")
-            on_text_validate:
-                root.inputtextfn()
-                root.text_validate()
+            pos_hint: {"center_x": 0.5}
 
         MDTextField:
             id: email
-            validator: "email"
-            helper_text: "Insira seu email"
-            helper_text_mode: "on_error"
             hint_text: "Email"
             icon_right: "email"
             mode: "rectangle"
             size_hint_x: None
             width: 300
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            on_text:
-                self.text = self.text.replace(" ", "")
+            pos_hint: {"center_x": 0.5}
 
         MDTextField:
             id: data_nascimento
@@ -354,40 +318,12 @@ MDScreenManager:
         MDTextField:
             id: senha
             hint_text: "Senha"
-            icon_right: "eye-off"
+            icon_right: "lock"
             password: True
-            max_text_length: 10
-            helper_text: "Máximo de 10 caracteres"
-            helper_text_mode: "on_error"
             mode: "rectangle"
             size_hint_x: None
             width: 300
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            on_text:
-                self.text = self.text.replace(" ", "")
-
-        MDBoxLayout:
-            size_hint: .85, None
-            height: "30dp"
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            MDCheckbox:
-                id: cb
-                size_hint: None, None
-                width: "30dp"
-                height: "30dp"
-                pos_hint: {'center_x':.5, 'center_y':.5}
-                on_press:
-                    senha.password = True if senha.password == False else False 
-                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
-            
-            MDLabel:
-                text: "[ref=Mostrar Senha]Mostrar Senha[/ref]"
-                markup: True
-                pos_hint: {'center_x':.5, 'center_y':.5}
-                on_ref_press:
-                    cb.active = True if cb.active == False else False
-                    senha.password = True if senha.password == False else False 
-                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
+            pos_hint: {"center_x": 0.5}
 
         MDRaisedButton:
             text: "Cadastrar"
@@ -395,7 +331,5 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
-            on_release: 
-                root.ids.userinput.dispatch('on_text_validate')
-                root.sign_up()    
+            on_release: root.sign_up()    
 '''
