@@ -1,4 +1,6 @@
 from ..services.connect import DBConnection
+from .usuario import Usuario
+from random import shuffle
 
 class Musica:
 
@@ -103,19 +105,17 @@ class Musica:
             new_obj = Musica()
             new_obj.__isNew = False
             read_data = {"id": inst[0], "nome": inst[1], "capa": inst[2], "link_spotify": inst[3]}
-            new_obj.change_values(read_data)
 
             # feedback positivo: True, negativo: False
-            feedback_list.append((new_obj, inst[4]))
+            feedback_list.append((read_data, inst[4]))
         
         no_feedback_list = []
         for inst in lines_no_feedback:
             new_obj = Musica()
             new_obj.__isNew = False
             read_data = {"id": inst[0], "nome": inst[1], "capa": inst[2], "link_spotify": inst[3]}
-            new_obj.change_values(read_data)
 
-            no_feedback_list.append(new_obj)
+            no_feedback_list.append(read_data)
 
         return feedback_list, no_feedback_list
     
@@ -146,3 +146,32 @@ class Musica:
         if query_ans == -1:
             return False
         return query_ans
+
+
+    @staticmethod
+    def getEvaluatedAndNotEvaluatedMusics(idUser: int):
+        user = Usuario.where({"id": idUser})
+        if user == False:
+            return False
+        musicas = Musica.classifyMusic(idUser)
+        if musicas == False:
+            return False
+        musicas_avaliadas = musicas[0]
+        musicas_nao_avaliadas = musicas[1]
+        avaliadas = []
+        nao_avaliadas = []
+
+        for musica_avaliada in musicas_avaliadas:
+            musica = musica_avaliada[0]
+            musica['evaluation'] = 'L' if musica_avaliada[1] else 'D'
+            musica['artista'] = [artista[0] for artista in Musica.getArtistsName(musica['id'])]
+            musica['estilo'] = [genero[0] for genero in Musica.getEstilosMusicais(musica['id'])]
+            avaliadas.append(musica)
+
+        for musica_nao_avaliada in musicas_nao_avaliadas:
+            musica = musica_nao_avaliada
+            musica['artista'] = [artista[0] for artista in Musica.getArtistsName(musica['id'])]
+            musica['estilo'] = [genero[0] for genero in Musica.getEstilosMusicais(musica['id'])]
+            nao_avaliadas.append(musica)
+
+        return shuffle(avaliadas), shuffle(nao_avaliadas)
