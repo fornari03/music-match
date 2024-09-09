@@ -104,7 +104,9 @@ class Musica:
         for inst in lines_feedback:
             new_obj = Musica()
             new_obj.__isNew = False
-            read_data = {"id": inst[0], "nome": inst[1], "capa": inst[2], "link_spotify": inst[3]}
+            with open (f"imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
+                arquivo.write(inst[2])
+            read_data = {"id": inst[0], "nome": inst[1], "capa": f'imagem_musica_{inst[0]}.jpg', "link_spotify": inst[3]}
 
             # feedback positivo: True, negativo: False
             feedback_list.append((read_data, inst[4]))
@@ -113,7 +115,9 @@ class Musica:
         for inst in lines_no_feedback:
             new_obj = Musica()
             new_obj.__isNew = False
-            read_data = {"id": inst[0], "nome": inst[1], "capa": inst[2], "link_spotify": inst[3]}
+            with open (f"imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
+                arquivo.write(inst[2])
+            read_data = {"id": inst[0], "nome": inst[1], "capa": f"imagem_musica_{inst[0]}.jpg", "link_spotify": inst[3]}
 
             no_feedback_list.append(read_data)
 
