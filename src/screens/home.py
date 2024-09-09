@@ -16,7 +16,7 @@ import webbrowser
 from datetime import datetime, timedelta
 
 from ..models.usuario import Usuario
-from login import usuario_logado
+import src.screens.login as login
 
 class HomeScreen(MDScreen):
     def __init__(self, **kwargs):
@@ -35,8 +35,8 @@ class HomeScreen(MDScreen):
         # TODO: implementar lógica de receber todos os eventos passados e futuros com a API do backend (ordem cronológica)
         # TODO: implementar lógica de receber os usuários conectados e não conectados com a API do backend (ordem por music_match)
 
-        self.connected = Usuario.get_connections(usuario_logado.id)
-        self.not_connected = Usuario.get_not_connections(usuario_logado.id)
+        self.connected = Usuario.get_connections(login.usuario_logado.id)
+        self.not_connected = Usuario.get_not_connections(login.usuario_logado.id)
 
         self.evaluated = [
             {"id": 4, "capa": "https://via.placeholder.com/150", "titulo": "musica 4", "artista": ["artista 4"], "genero": ["MPB"], "spotify_link": "https://open.spotify.com", "evaluation": "L"},

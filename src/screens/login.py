@@ -7,11 +7,12 @@ from ..utils.encrypt import encrypt_password
 class LoginScreen(MDScreen):
     def login(self):
         global usuario_logado
-        usuario_logado = Usuario.where({"email": email})
 
-        email = encrypt_password(self.ids.email.text)
-        senha = self.ids.senha.text
-        if usuario_logado == False:
+        email = self.ids.email.text
+        senha = encrypt_password(self.ids.senha.text)
+
+        usuario_logado = Usuario.where({"email": f"'{email}'"})
+        if usuario_logado == False or len(usuario_logado) == 0:
             self.dialog = MDDialog(title="Erro", text="Email não cadastrado", size_hint=(0.7, 0.2))
             self.dialog.open()
             self.ids.email.text = ""
@@ -22,6 +23,7 @@ class LoginScreen(MDScreen):
                 self.dialog.open()
                 self.ids.senha.text = ""
             else:
+                usuario_logado = usuario_logado[0]
                 self.manager.current = "home_screen"
 
     def sign_up(self):
