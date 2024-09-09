@@ -60,8 +60,9 @@ class HomeScreen(MDScreen):
         self.show_connections_grid()
 
         self.events = [
-            {"name": "HH Ceubinho", "descricao": "HH do Ceubinho é o melhor que tem uau que festa legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-09-12 19:00:00", "conexoes_interessadas": [self.connected[0]], "image": "screens/imagem.jpg"}, {"name": "Show Bruno Mars", "descricao": "O Bruninho vem para Brasília ebaaaaaaaaaaa.", "localizacao": "Estádio Mané Garrinhcha", "data": "2024-10-26 18:00:00", "conexoes_interessadas": self.connected, "image": "screens/imagem.jpg"},
-            {"name": "Festa do Calouro", "descricao": "Festa do Calouro da UnB, vai ser muito legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-08-12 19:00:00", "conexoes_foram": [self.connected[2]], "image": "screens/imagem.jpg"},
+            {"id": 1, "name": "HH Ceubinho", "descricao": "HH do Ceubinho é o melhor que tem uau que festa legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-09-12 19:00:00", "conexoes_interessadas": [self.connected[0]], "image": "screens/imagem.jpg", "status": "I"},
+            {"id": 2, "name": "Show Bruno Mars", "descricao": "O Bruninho vem para Brasília ebaaaaaaaaaaa.", "localizacao": "Estádio Mané Garrinhcha", "data": "2024-10-26 18:00:00", "conexoes_interessadas": self.connected, "image": "screens/imagem.jpg", "status": "N"},
+            {"id": 3, "name": "Festa do Calouro", "descricao": "Festa do Calouro da UnB, vai ser muito legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-08-12 19:00:00", "conexoes_foram": [self.connected[2]], "image": "screens/imagem.jpg", "status": "P"},
         ]
 
         self.show_events_grid()
@@ -186,8 +187,8 @@ class HomeScreen(MDScreen):
 
     ############################## Tela de Eventos ##############################
 
-    def add_event_banner(self, event, status):
-        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(350, 300), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300)
+    def add_event_banner(self, event):
+        banner = MDCard(id=f"banner_{event['id']}", orientation="vertical", size_hint=(0.5, None), size=(350, 300), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300)
 
         grid_layout = MDGridLayout(cols=2, padding=[5, 10, 5, 10], spacing=10)
 
@@ -212,7 +213,10 @@ class HomeScreen(MDScreen):
             else:
                 texto = f"{event['conexoes_interessadas'][0]['name']} e mais {len(event['conexoes_interessadas'])-1} conexões se interessaram neste evento."
             box_layout.add_widget(MDLabel(text=texto, size_hint=(1, 0.6), italic=True))
-            interest_button = MDRoundFlatIconButton(id="interest_button", text="Tenho interesse", size_hint=(0.25, None), icon="alarm-note")
+            if event['status'] == "I":
+                interest_button = MDRoundFlatIconButton(id="interest_button", text="Sem interesse", size_hint=(0.25, None), icon="alarm-note")
+            else:
+                interest_button = MDRoundFlatIconButton(id="interest_button", text="Tenho interesse", size_hint=(0.25, None), icon="alarm-note")
 
         else:
             if len(event['conexoes_foram']) == 0:
@@ -222,11 +226,33 @@ class HomeScreen(MDScreen):
             else:
                 texto = f"{event['conexoes_foram'][0]['name']} e mais {len(event['conexoes_foram'])-1} conexões foram para este evento."
             box_layout.add_widget(MDLabel(text=texto, size_hint=(1, 0.6), italic=True))
-            interest_button = MDRoundFlatIconButton(id="interest_button", text="Estive presente", size_hint=(0.25, None), icon="account-check")
-            interest_button.on_release = lambda: self.mark_presence(banner)
+            if event['status'] == "P":
+                interest_button = MDRoundFlatIconButton(id="interest_button", text="Marcar ausência", size_hint=(0.25, None), icon="account-check")
+            else:
+                interest_button = MDRoundFlatIconButton(id="interest_button", text="Marcar presença", size_hint=(0.25, None), icon="account-check")
 
         grid_layout_baixo = MDGridLayout(cols=2, spacing=5)
-        grid_layout_baixo.add_widget(MDLabel(text=""))      # gambiarra para deixar o botão na direita
+
+        if interest_button.text == "Tenho interesse":
+            # se o evento é futuro e o usuário não se interessou
+            interest = MDLabel(id="label_interest", text="Você não demonstrou interesse no evento.", size_hint=(1, 0.6), italic=True)
+            grid_layout_baixo.add_widget(interest)
+            interest_button.on_release = lambda: self.mark_interest(banner, interest_button, interest)
+        elif interest_button.text == "Marcar presença":
+            # se o evento já passou e o usuário não foi
+            interest = MDLabel(id="label_interest", text="Você não marcou presença no evento.", size_hint=(1, 0.6), italic=True)
+            grid_layout_baixo.add_widget(interest)
+            interest_button.on_release = lambda: self.mark_presence(banner, interest_button, interest)
+        elif interest_button.text == "Sem interesse":
+            # se o evento é futuro e o usuário se interessou
+            interest = MDLabel(id="label_interest", text="Você demonstrou interesse no evento.", size_hint=(1, 0.6), italic=True)
+            grid_layout_baixo.add_widget(interest)
+            interest_button.on_release = lambda: self.mark_interest(banner, interest_button, interest)
+        else:
+            # se o evento já passou e o usuário foi
+            interest = MDLabel(id="label_interest", text="Você marcou presença no evento.", size_hint=(1, 0.6), italic=True)
+            grid_layout_baixo.add_widget(interest)
+            interest_button.on_release = lambda: self.mark_presence(banner, interest_button, interest)
 
         grid_layout_baixo.add_widget(interest_button)
 
@@ -238,20 +264,39 @@ class HomeScreen(MDScreen):
 
         self.ids.events_grid.add_widget(banner)
 
-    def mark_interest(self, banner):
-        for i in range(len(self.ids.events_grid.children)-1, -1, -1):
-            if self.ids.connections_grid.children[i] == banner:
-                print(banner.children[0].children)
-                # TODO: implementar lógica de marcar interesse com o API do backend
-                break
-        self.ids.interest_button.text = "Interesse marcado"
+    def mark_interest(self, banner, interest_button, interest_label):
+        if interest_button.text == "Tenho interesse":
+            interest_label.text = "Você demonstrou interesse no evento."
+            interest_button.text = "Sem interesse"
+            for event in self.events:
+                if event['id'] == int(banner.id.split("_")[1]):
+                    event['status'] = "I"
+                    # TODO: implementar lógica de marcar interesse com o API do backend
+                    break
+        else:
+            interest_label.text = "Você não demonstrou interesse no evento."
+            interest_button.text = "Tenho interesse"
+            for event in self.events:
+                if event['id'] == int(banner.id.split("_")[1]):
+                    event['status'] = "N"
+                    # TODO: implementar lógica de marcar desinteresse com o API do backend
+                    break
 
-    def mark_presence(self, banner):
-        for i in range(len(self.ids.connections_grid.children)-1, -1, -1):
-            if self.ids.connections_grid.children[i] == banner:
-                print(banner.children[0].children)
-                break
-        self.ids.interest_button.text = "Presença marcada"
+    def mark_presence(self, banner, interest_button, interest_label):
+        if interest_button.text == "Marcar presença":
+            interest_label.text = "Você marcou presença no evento."
+            interest_button.text = "Marcar ausência"
+            for event in self.events:
+                if event['id'] == int(banner.id.split("_")[1]):
+                    event['status'] = "P"
+                    # TODO: implementar lógica de marcar presença com o API do backend
+                    break
+        else:
+            interest_label.text = "Você não marcou presença no evento."
+            interest_button.text = "Marcar presença"
+            for event in self.events:
+                if event['id'] == int(banner.id.split("_")[1]):
+                    event['status'] = "N"
 
     def show_events_grid(self, search_string=None):
         self.ids.events_grid.clear_widgets()
@@ -260,13 +305,13 @@ class HomeScreen(MDScreen):
                 data_evento = datetime.strptime(event['data'], "%Y-%m-%d %H:%M:%S")
                 if data_evento >= datetime.now():
                     if search_string is None or search_string.lower().strip() in event['name'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in data_evento.strftime('%d/%m/%Y - %H:%M'):
-                        self.add_event_banner(event, "connected")
+                        self.add_event_banner(event)
         else:
             for event in self.events:
                 data_evento = datetime.strptime(event['data'], "%Y-%m-%d %H:%M:%S")
                 if data_evento < datetime.now():
                     if search_string is None or search_string.lower().strip() in event['name'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in data_evento.strftime('%d/%m/%Y - %H:%M'):
-                        self.add_event_banner(event, "not_connected")
+                        self.add_event_banner(event)
 
     def switch_events_view(self):
         self.showing_future_events = not self.showing_future_events
