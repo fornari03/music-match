@@ -34,18 +34,6 @@ class HomeScreen(MDScreen):
 
         self.evaluated, self.not_evaluated = Musica.getEvaluatedAndNotEvaluatedMusics(usuario_logado.id)
 
-        self.evaluated = [
-            {"id": 4, "capa": "https://via.placeholder.com/150", "nome": "musica 4", "artista": ["artista 4"], "genero": ["MPB"], "spotify_link": "https://open.spotify.com", "evaluation": "L"},
-            {"id": 5, "capa": "https://via.placeholder.com/150", "nome": "musica 5", "artista": ["artista 5"], "genero": ["Pop"], "spotify_link": "https://open.spotify.com", "evaluation": "L"},
-            {"id": 6, "capa": "https://via.placeholder.com/150", "nome": "musica 6", "artista": ["artista 6"], "genero": ["Rock"], "spotify_link": "https://open.spotify.com", "evaluation": "D"},
-        ]
-
-        self.not_evaluated = [
-            {"id": 1, "capa": "https://via.placeholder.com/150", "nome": "Ainda Gosto Dela", "artista": ["Skank"], "genero": ["MPB"], "spotify_link": "https://open.spotify.com/intl-pt/track/3eW8Di8rolVzktc3xW7hba?si=156bacc4d77c4f1c"},
-            {"id": 2, "capa": "https://via.placeholder.com/150", "nome": "musica 2", "artista": ["artista 2"], "genero": ["Pop"], "spotify_link": "https://open.spotify.com"},
-            {"id": 3, "capa": "https://via.placeholder.com/150", "nome": "musica 3", "artista": ["artista 3"], "genero": ["Rock"], "spotify_link": "https://open.spotify.com"},
-        ]
-
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
 
         self.show_music_list()
