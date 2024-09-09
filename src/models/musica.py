@@ -23,10 +23,14 @@ class Musica:
     def save(self):
         if self.nome == None:
             self.nome = "NULL"
+        elif self.nome[0] != "'" and self.nome[-1] != "'":
+            self.nome = f"'{self.nome}'"
         if self.capa == None:
             self.capa = "NULL"
         if self.link_spotify == None:
             self.link_spotify = "NULL"
+        elif self.link_spotify[0] != "'" and self.link_spotify[-1] != "'":
+            self.link_spotify = f"'{self.link_spotify}'"
 
         if self.__isNew:
             sql = f"INSERT INTO musica (nome, capa, link_spotify) VALUES ({self.nome}, {self.capa}, {self.link_spotify})"
