@@ -297,6 +297,8 @@ class HomeScreen(MDScreen):
             for event in self.events:
                 if event['id'] == int(banner.id.split("_")[1]):
                     event['status'] = "N"
+                    # TODO: implementar lógica de marcar ausência com o API do backend
+                    break
 
     def show_events_grid(self, search_string=None):
         self.ids.events_grid.clear_widgets()
@@ -435,27 +437,6 @@ class HomeScreen(MDScreen):
         self.show_connections_grid()
         # TODO: implementar lógica de adição de conexão com o API do backend
 
-    def open_profile(self, user):
-        # TODO: verificar se é plausível abrir o perfil do usuário em um dialog ou outra tela
-        # self.dialog = MDDialog(
-        #         title="Ver Perfil",
-        #         type="custom",
-        #         size_hint=(0.8, 0.8),
-        #         content_cls=
-        #             MDBoxLayout(
-        #                 MDLabel(text=user['name']),
-        #                 MDLabel(text="    //    ".join(user['social_media'])),
-        #                 MDLabel(text=f"Gosto musical: {', '.join([': '.join([genero, str(perc)+'%']) for [genero, perc] in user['musical_taste']])}"),
-        #                 MDLabel(text=f"Music Match: {user['music_match']}%"),
-        #                 orientation="vertical",
-        #                 padding=[10],
-        #                 spacing=10,
-        #                 size_hint=(0.8, 0.8)
-        #             )        
-        #     )
-        # self.dialog.open()
-        pass
-
     def show_connections_grid(self, search_string=None):
         # TODO: melhorar algoritmo de mostrar usuários conectados e não conectados,
         # calcular e ordenar por music_match
@@ -551,10 +532,6 @@ class HomeScreen(MDScreen):
         self.ids.home_screen_bottom_nav.switch_tab("inicio")
         self.manager.current = "login_screen"
         # TODO: implementar lógica de exclusão de conta com o API do backend
-
-    def set_profile_pic(self):
-        # TODO: possibilitar abrir arquivos de imagem do dispositivo
-        pass
 
     def add_social_media_item(self, social_media: str):
         new_item = OneLineIconListItem(on_press=lambda x: self.checkbox_selected(len(self.ids.lista_opcoes.children)))
