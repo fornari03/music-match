@@ -60,9 +60,9 @@ class HomeScreen(MDScreen):
         self.show_connections_grid()
 
         self.events = [
-            {"id": 1, "name": "HH Ceubinho", "descricao": "HH do Ceubinho é o melhor que tem uau que festa legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-09-12 19:00:00", "conexoes_interessadas": [self.connected[0]], "image": "screens/imagem.jpg", "status": "I"},
-            {"id": 2, "name": "Show Bruno Mars", "descricao": "O Bruninho vem para Brasília ebaaaaaaaaaaa.", "localizacao": "Estádio Mané Garrinhcha", "data": "2024-10-26 18:00:00", "conexoes_interessadas": self.connected, "image": "screens/imagem.jpg", "status": "N"},
-            {"id": 3, "name": "Festa do Calouro", "descricao": "Festa do Calouro da UnB, vai ser muito legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-08-12 19:00:00", "conexoes_foram": [self.connected[2]], "image": "screens/imagem.jpg", "status": "P"},
+            {"id": 1, "name": "HH Ceubinho", "descricao": "HH do Ceubinho é o melhor que tem uau que festa legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-09-12 19:00:00", "conexoes_interessadas": [self.connected[0]], "image": "screens/imagem.jpg", "status": "I", "artistas": ["artista1"], "generos": ["Funk", "Pop"]},
+            {"id": 2, "name": "Show Bruno Mars", "descricao": "O Bruninho vem para Brasília ebaaaaaaaaaaa.", "localizacao": "Estádio Mané Garrinhcha", "data": "2024-10-26 18:00:00", "conexoes_interessadas": self.connected, "image": "screens/imagem.jpg", "status": "N", "artistas": ["Bruno Mars"], "generos": ["Pop"]},
+            {"id": 3, "name": "Festa do Calouro", "descricao": "Festa do Calouro da UnB, vai ser muito legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-08-12 19:00:00", "conexoes_foram": [self.connected[2]], "image": "screens/imagem.jpg", "status": "P", "artistas": ["artista1", "artista2"], "generos": ["Funk", "Pop"]},
         ]
 
         self.show_events_grid()
@@ -204,6 +204,10 @@ class HomeScreen(MDScreen):
         box_layout.add_widget(MDLabel(text=f"Data: {data_evento.strftime('%d/%m/%Y - %H:%M')}", size_hint=(1, 0.6)))
 
         box_layout.add_widget(MDLabel(text=f"Local: {event['localizacao']}", size_hint=(1, 0.6)))
+
+        box_layout.add_widget(MDLabel(text=f"Artistas: {', '.join(event['artistas'])}", size_hint=(1, 0.6)))
+
+        box_layout.add_widget(MDLabel(text=f"Estilos: {', '.join(event['generos'])}", size_hint=(1, 0.6)))
 
         if data_evento >= datetime.now():
             if len(event['conexoes_interessadas']) == 0:
