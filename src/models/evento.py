@@ -236,3 +236,19 @@ class Evento:
             return False
         return True
     
+    @staticmethod
+    def getArtists(idEvent: int):
+        sql = f"SELECT a.nome FROM artista a JOIN participa p ON a.id=p.id_artista WHERE p.id_evento={idEvent}"
+
+        query_ans = DBConnection.query(sql, True)
+        if query_ans == -1:
+            return False
+        return query_ans
+    
+    def getEstilosMusicais(idEvento: int):
+        sql = f"SELECT em.nome FROM evento_tem_estilo_musical eem JOIN estilo_musical em ON em.id=eem.id_estilo_musical WHERE eem.id_evento={idEvento}"
+
+        query_ans = DBConnection.query(sql, True)
+        if query_ans == -1:
+            return False
+        return query_ans
