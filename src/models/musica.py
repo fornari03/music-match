@@ -78,3 +78,40 @@ class Musica:
         if query_ans == -1:
             return False
         return query_ans
+    
+    # retorna duas listas:
+    # uma com as musicas que ja tem feedback, uma tupla de um obj musica com o feedback
+    # uma com as musicas sem feedback, so com o objeto
+    @staticmethod
+    def classifyMusic(idUser: int):
+        sql_feedback = f"SELECT m.id, m.nome, m.capa, m.link_spotify, uam.feedback FROM musica m JOIN usuario_avalia_musica uam ON m.id=uam.id_musica WHERE uam.id_usuario={idUser}"
+        sql_no_feedback = f"SELECT m.id, m.nome, m.capa, m.link_spotify FROM musica m WHERE m.id NOT IN (SELECT uam.id_musica FROM usuario_avalia_musica uam WHERE uam.id_usuario={idUser})"
+
+        lines_feedback = DBConnection.query(sql_feedback, True)
+        if lines_feedback == -1:
+            return False
+
+        lines_no_feedback = DBConnection.query(sql_no_feedback, True)
+        if lines_no_feedback == -1:
+            return False
+        
+        feedback_list = []
+        for inst in lines_feedback:
+            new_obj = Musica()
+            new_obj.__isNew = False
+            read_data = {"id": inst[0], "nome": inst[1], "capa": inst[2], "link_spotify": inst[3]}
+            new_obj.change_values(read_data)
+
+            # feedback positivo: True, negativo: False
+            feedback_list.append((new_obj, inst[4]))
+        
+        no_feedback_list = []
+        for inst in lines_no_feedback:
+            new_obj = Musica()
+            new_obj.__isNew = False
+            read_data = {"id": inst[0], "nome": inst[1], "capa": inst[2], "link_spotify": inst[3]}
+            new_obj.change_values(read_data)
+
+            no_feedback_list.append(new_obj)
+
+        return feedback_list, no_feedback_list
