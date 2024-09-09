@@ -35,8 +35,4 @@ class SignUpScreen(MDScreen):
         data_nascimento = self.ids.data_nascimento.text.strip()
         senha = self.ids.senha.text.strip()
         # TODO: implementar lógica de sign up com o API do backend
-        pass
-
-    def set_profile_pic(self):
-        # TODO: possibilitar abrir arquivos de imagem do dispositivo
-        pass
+        self.manager.current = "login_screen"
