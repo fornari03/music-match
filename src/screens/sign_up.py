@@ -9,17 +9,6 @@ class SignUpScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def build(self):
-        self.screen.ids.text_field_error.bind(
-            on_text_validate=self.set_error_message,
-            on_focus=self.set_error_message,
-        )
-
-        return self.screen
-
-    def set_error_message(self, instance_textfield):
-        self.screen.ids.text_field_error.error = True
-
     def show_date_picker(self):
         date_dialog = MDDatePicker()
         date_dialog.open()
@@ -36,7 +25,3 @@ class SignUpScreen(MDScreen):
         senha = self.ids.senha.text.strip()
         # TODO: implementar lógica de sign up com o API do backend
         self.manager.current = "login_screen"
-
-    def set_profile_pic(self):
-        # TODO: possibilitar abrir arquivos de imagem do dispositivo
-        pass

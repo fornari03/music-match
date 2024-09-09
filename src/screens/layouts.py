@@ -45,35 +45,12 @@ MDScreenManager:
         MDTextField:
             id: senha
             hint_text: "Senha"
-            icon_right: "eye-off"
+            icon_right: "lock"
             password: True
             mode: "rectangle"
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
-        MDBoxLayout:
-            size_hint: .85, None
-            height: "30dp"
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            MDCheckbox:
-                id: cb
-                size_hint: None, None
-                width: "30dp"
-                height: "30dp"
-                pos_hint: {'center_x':.5, 'center_y':.5}
-                on_press:
-                    senha.password = True if senha.password == False else False 
-                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
-            
-            MDLabel:
-                text: "[ref=Mostrar Senha]Mostrar Senha[/ref]"
-                markup: True
-                pos_hint: {'center_x':.5, 'center_y':.5}
-                on_ref_press:
-                    cb.active = True if cb.active == False else False
-                    senha.password = True if senha.password == False else False 
-                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
-
         MDRaisedButton:
             text: "Login"
             md_bg_color: (1, 0, 1, 1)
@@ -95,21 +72,55 @@ MDScreenManager:
 <HomeScreen>:
     name: "home_screen"
     MDBottomNavigation:
+        id: home_screen_bottom_nav
         MDBottomNavigationItem:
             name: 'inicio'
             text: 'Início'
             icon: 'music-circle'
-            MDScrollView:
-                MDList:
-                    id: music_list
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: [0,0,0,10]
+                MDTopAppBar:
+                    title: "Músicas"
+                    md_bg_color: (1, 0, 1, 1)
+                    left_action_items: [["order-bool-ascending", lambda x: root.switch_musics_view()]]
+                    right_action_items: [["magnify", lambda x: root.show_musics_search()]]
+                MDScrollView:
+                    MDList:
+                        id: music_list
+                MDRaisedButton:
+                    text: "Salvar"
+                    md_bg_color: (0.31, 0.78, 0.47, 1)
+                    size_hint_x: None
+                    width: 300
+                    pos_hint: {"center_x": 0.5}
+                    on_release: root.save_evaluations()
+                    
 
         MDBottomNavigationItem:
             name: 'eventos'
             text: 'Eventos'
             icon: 'calendar-month'
-            MDLabel:
-                text: "Eventos"
-                halign: "center"
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: dp(0)
+                MDTopAppBar:
+                    title: "Eventos"
+                    md_bg_color: (1, 0, 1, 1)
+                    left_action_items: [["calendar-clock", lambda x: root.switch_events_view()]]
+                    right_action_items: [["magnify", lambda x: root.show_events_search()]]
+
+                MDScrollView:
+                    MDGridLayout:
+                        id: events_grid
+                        cols: 1
+                        row_default_height: dp(260)
+                        row_force_default: True
+                        spacing: dp(80)
+                        padding: dp(50)
+                        size_hint_y: None
+                        height: self.minimum_height
+                        adaptive_height: True
 
         MDBottomNavigationItem:
             name: 'conexoes'
@@ -128,9 +139,9 @@ MDScreenManager:
                     MDGridLayout:
                         id: connections_grid
                         cols: 1
-                        row_default_height: dp(150)
+                        row_default_height: dp(160)
                         row_force_default: True
-                        spacing: dp(80)
+                        spacing: dp(60)
                         padding: dp(50)
                         size_hint_y: None
                         height: self.minimum_height
@@ -241,13 +252,25 @@ MDScreenManager:
                         pos_hint: {"center_x": 0.85}
                     MDLabel:
                         text: "" # gambiarra total para ajustar o layout
-                MDRaisedButton:
-                    text: "Salvar"
-                    md_bg_color: (0.31, 0.78, 0.47, 1)
-                    size_hint_x: None
-                    width: 300
-                    pos_hint: {"center_x": 0.5}
-                    on_release: root.save()
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(180)
+                    padding: [dp(200), dp(30), dp(200), dp(20)]
+                    pos_hint: {"center_y": 0.5}
+                    MDRaisedButton:
+                        text: "Salvar"
+                        md_bg_color: (0.31, 0.78, 0.47, 1)
+                        size_hint_x: None
+                        width: 300
+                        pos_hint: {"center_x": 0.5}
+                        on_release: root.save()
+                    MDRaisedButton:
+                        text: "Excluir conta"
+                        md_bg_color: (1, 0, 0, 1)
+                        size_hint_x: None
+                        width: 300
+                        pos_hint: {"center_x": 0.5}
+                        on_release: root.delete_account()
 
 
 <SignUpScreen>:
@@ -267,33 +290,20 @@ MDScreenManager:
         MDTextField:
             id: nome
             hint_text: "Nome"
-            max_text_length: 10
-            helper_text_mode: "on_error"
-            helper_text: "Máximo de 10 caracteres"
             icon_right: "account"
             mode: "rectangle"
             size_hint_x: None
             width: 300
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            on_text:
-                self.text = self.text.replace(" ", "")
-            on_text_validate:
-                root.inputtextfn()
-                root.text_validate()
+            pos_hint: {"center_x": 0.5}
 
         MDTextField:
             id: email
-            validator: "email"
-            helper_text: "Insira seu email"
-            helper_text_mode: "on_error"
             hint_text: "Email"
             icon_right: "email"
             mode: "rectangle"
             size_hint_x: None
             width: 300
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            on_text:
-                self.text = self.text.replace(" ", "")
+            pos_hint: {"center_x": 0.5}
 
         MDTextField:
             id: data_nascimento
@@ -308,47 +318,12 @@ MDScreenManager:
         MDTextField:
             id: senha
             hint_text: "Senha"
-            icon_right: "eye-off"
+            icon_right: "lock"
             password: True
-            max_text_length: 10
-            helper_text: "Máximo de 10 caracteres"
-            helper_text_mode: "on_error"
             mode: "rectangle"
             size_hint_x: None
             width: 300
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            on_text:
-                self.text = self.text.replace(" ", "")
-
-        MDBoxLayout:
-            size_hint: .85, None
-            height: "30dp"
-            pos_hint: {'center_x':.5, 'center_y':.5}
-            MDCheckbox:
-                id: cb
-                size_hint: None, None
-                width: "30dp"
-                height: "30dp"
-                pos_hint: {'center_x':.5, 'center_y':.5}
-                on_press:
-                    senha.password = True if senha.password == False else False 
-                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
-            
-            MDLabel:
-                text: "[ref=Mostrar Senha]Mostrar Senha[/ref]"
-                markup: True
-                pos_hint: {'center_x':.5, 'center_y':.5}
-                on_ref_press:
-                    cb.active = True if cb.active == False else False
-                    senha.password = True if senha.password == False else False 
-                    senha.icon_right = "eye" if senha.icon_right == "eye-off" else "eye-off"
-
-        MDRaisedButton:
-            text: "Adicionar Foto de Perfil"
-            md_bg_color: (1, 0, 1, 1)
-            size_hint_x: 0.3
             pos_hint: {"center_x": 0.5}
-            on_release: root.set_profile_pic()
 
         MDRaisedButton:
             text: "Cadastrar"
@@ -356,7 +331,5 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
-            on_release: 
-                root.ids.userinput.dispatch('on_text_validate')
-                root.sign_up()    
+            on_release: root.sign_up()    
 '''
