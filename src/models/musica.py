@@ -132,3 +132,9 @@ class Musica:
         if DBConnection.query(sql, False) == -1:
             return False
         return True
+    
+    # pega os estilos musicais de uma musica
+    @staticmethod
+    def getEstilosMusicais(idMusic: int):
+        #TODO
+        pass
