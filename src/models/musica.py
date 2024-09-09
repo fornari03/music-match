@@ -132,3 +132,13 @@ class Musica:
         if DBConnection.query(sql, False) == -1:
             return False
         return True
+    
+    # pega os estilos musicais de uma musica
+    @staticmethod
+    def getEstilosMusicais(idMusic: int):
+        sql = f"SELECT em.nome FROM pertence_ao pa JOIN estilo_musical em ON em.id=pa.id_estilo_musical WHERE pa.id_musica={idMusic}"
+
+        query_ans = DBConnection.query(sql, True)
+        if query_ans == -1:
+            return False
+        return query_ans
