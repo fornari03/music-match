@@ -366,5 +366,3 @@ class Usuario:
             "redes_sociais": Usuario.findSocialMedia(f"'{user.email}'"),
 
         }
-    
-print(Usuario.get_connections(4))
