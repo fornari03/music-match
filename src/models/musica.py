@@ -137,6 +137,15 @@ class Musica:
             return False
         return True
     
+    # atualiza o feedback do usuario idUser para a musica idMusic
+    @staticmethod
+    def updateFeedback(idMusic: int, idUser: int, feedback: bool):
+        sql = f"UPDATE usuario_avalia_musica SET feedback = {feedback} WHERE id_usuario = {idUser} AND id_musica = {idMusic}"
+        
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
+    
     # pega os estilos musicais de uma musica
     @staticmethod
     def getEstilosMusicais(idMusic: int):
