@@ -1,5 +1,4 @@
 from ..services.connect import DBConnection
-from ..models.artista import Artista
 
 class Musica:
 
@@ -115,3 +114,21 @@ class Musica:
             no_feedback_list.append(new_obj)
 
         return feedback_list, no_feedback_list
+    
+    # cria um feedback entre a musica e o usuario com os ids especificados
+    @staticmethod
+    def createFeedback(idMusic: int, idUser: int, feedback: bool):
+        sql = f"INSERT INTO usuario_avalia_musica (id_usuario, id_musica, feedback) VALUES ({idUser}, {idMusic}, {feedback})"
+
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
+    
+    # retira o feedback do usuario idUser pra musica idMusic
+    @staticmethod
+    def removeFeedback(idMusic: int, idUser: int):
+        sql = f"DELETE FROM usuario_avalia_musica WHERE id_usuario={idUser} AND id_musica={idMusic}"
+
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
