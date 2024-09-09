@@ -101,9 +101,26 @@ MDScreenManager:
             name: 'eventos'
             text: 'Eventos'
             icon: 'calendar-month'
-            MDLabel:
-                text: "Eventos"
-                halign: "center"
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: dp(0)
+                MDTopAppBar:
+                    title: "Eventos"
+                    md_bg_color: (1, 0, 1, 1)
+                    left_action_items: [["calendar-clock", lambda x: root.switch_events_view()]]
+                    right_action_items: [["magnify", lambda x: root.show_events_search()]]
+
+                MDScrollView:
+                    MDGridLayout:
+                        id: events_grid
+                        cols: 1
+                        row_default_height: dp(260)
+                        row_force_default: True
+                        spacing: dp(80)
+                        padding: dp(50)
+                        size_hint_y: None
+                        height: self.minimum_height
+                        adaptive_height: True
 
         MDBottomNavigationItem:
             name: 'conexoes'
@@ -122,9 +139,9 @@ MDScreenManager:
                     MDGridLayout:
                         id: connections_grid
                         cols: 1
-                        row_default_height: dp(150)
+                        row_default_height: dp(160)
                         row_force_default: True
-                        spacing: dp(80)
+                        spacing: dp(60)
                         padding: dp(50)
                         size_hint_y: None
                         height: self.minimum_height
