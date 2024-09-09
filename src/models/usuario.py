@@ -229,7 +229,7 @@ class Usuario:
 
         idUser = user[0].id
 
-        sql = f"SELECT u.id, u.nome, music_match.sintonia FROM calcular_sintonia_musical({idUser}) music_match JOIN usuario u ON music_match.id_usuario=u.id
+        sql = f"""SELECT u.id, u.nome, music_match.sintonia FROM calcular_sintonia_musical({idUser}) music_match JOIN usuario u ON music_match.id_usuario=u.id
                     WHERE music_match.id_usuario IN (
                         SELECT 
                             CASE 
@@ -237,7 +237,7 @@ class Usuario:
                             ELSE cc.id_usuario_1 
                             END 
                         FROM conecta_com cc WHERE cc.id_usuario_1={idUser} OR cc.id_usuario_2={idUser})
-                    ORDER BY music_match.sintonia DESC"
+                    ORDER BY music_match.sintonia DESC"""
         
         query_ret = DBConnection.query(sql, True)
         if query_ret == -1:
@@ -254,7 +254,7 @@ class Usuario:
 
         idUser = user[0].id
 
-        sql = f"SELECT u.id, u.nome, music_match.sintonia FROM calcular_sintonia_musical({idUser}) music_match JOIN usuario u ON music_match.id_usuario=u.id
+        sql = f"""SELECT u.id, u.nome, music_match.sintonia FROM calcular_sintonia_musical({idUser}) music_match JOIN usuario u ON music_match.id_usuario=u.id
                     WHERE music_match.id_usuario NOT IN (
                         SELECT 
                             CASE 
@@ -262,7 +262,7 @@ class Usuario:
                             ELSE cc.id_usuario_1 
                             END 
                         FROM conecta_com cc WHERE cc.id_usuario_1={idUser} OR cc.id_usuario_2={idUser})
-                    ORDER BY music_match.sintonia DESC"
+                    ORDER BY music_match.sintonia DESC"""
         
         query_ret = DBConnection.query(sql, True)
         if query_ret == -1:
@@ -270,28 +270,33 @@ class Usuario:
         return query_ret
     
     @staticmethod
-    def get_connections(self, id: int):
+    def get_connections(id: int):
         user = Usuario.where({"id": id})
-        otherUsers = Usuario.findConnections(user[0].email)
+        if user == False:
+            return False
+        
+        otherUsers = Usuario.findConnections(f"'{user[0].email}'")
         if otherUsers == False:
             return False
+        
+        otherDicts = []
         for otherUser in otherUsers:
             otherUser = Usuario.others_to_dict(otherUser[0])
-            sql = f"SELECT ar.nome FROM avaliacao av
-                        JOIN artista_tem atm ON av.id = atm.id
-                        JOIN artista ar ON atm.id = ar.id
+            sql = f"""SELECT ar.nome FROM usuario_avalia_musica av
+                        JOIN artista_tem_musica atm ON av.id_musica = atm.id_musica
+                        JOIN artista ar ON atm.id_artista = ar.id
                         WHERE av.id_usuario = {otherUser['id']} 
                               AND av.feedback = TRUE
                         GROUP BY ar.id, ar.nome
                         ORDER BY COUNT(*) DESC
                         LIMIT 3;
-                        "
+                        """
             artistas = DBConnection.query(sql, True)
             if artistas == -1:
                 return False
             otherUser["artists"] = [artista[0] for artista in artistas]
 
-            sql = f"SELECT em.nome FROM avaliacao av
+            sql = f"""SELECT em.nome FROM usuario_avalia_musica av
                         JOIN pertence_ao pa ON av.id_musica = pa.id_musica
                         JOIN estilo_musical em ON pa.id_estilo_musical = em.id
                         WHERE av.id_usuario = {otherUser['id']} 
@@ -299,36 +304,43 @@ class Usuario:
                         GROUP BY em.id, em.nome
                         ORDER BY COUNT(*) DESC
                         LIMIT 3;
-                        "
+                        """
             gosto_musical = DBConnection.query(sql, True)
             if gosto_musical == -1:
                 return False
             otherUser["musical_taste"] = [genero[0] for genero in gosto_musical]
-        return otherUsers
+
+            otherDicts.append(otherUser)
+        return otherDicts
     
     @staticmethod
-    def get_not_connections(self, id: int):
+    def get_not_connections(id: int):
         user = Usuario.where({"id": id})
-        otherUsers = Usuario.findNotConnections(user[0].email)
+        if user == False:
+            return False
+        
+        otherUsers = Usuario.findNotConnections(f"'{user[0].email}'")
         if otherUsers == False:
             return False
+        
+        otherDicts = []
         for otherUser in otherUsers:
             otherUser = Usuario.others_to_dict(otherUser[0])
-            sql = f"SELECT ar.nome FROM avaliacao av
-                        JOIN artista_tem atm ON av.id = atm.id
-                        JOIN artista ar ON atm.id = ar.id
+            sql = f"""SELECT ar.nome FROM usuario_avalia_musica av
+                        JOIN artista_tem_musica atm ON av.id_musica = atm.id_musica
+                        JOIN artista ar ON atm.id_artista = ar.id
                         WHERE av.id_usuario = {otherUser['id']} 
                               AND av.feedback = TRUE
                         GROUP BY ar.id, ar.nome
                         ORDER BY COUNT(*) DESC
                         LIMIT 3;
-                        "
+                        """
             artistas = DBConnection.query(sql, True)
             if artistas == -1:
                 return False
             otherUser["artists"] = [artista[0] for artista in artistas]
 
-            sql = f"SELECT em.nome FROM avaliacao av
+            sql = f"""SELECT em.nome FROM usuario_avalia_musica av
                         JOIN pertence_ao pa ON av.id_musica = pa.id_musica
                         JOIN estilo_musical em ON pa.id_estilo_musical = em.id
                         WHERE av.id_usuario = {otherUser['id']} 
@@ -336,19 +348,23 @@ class Usuario:
                         GROUP BY em.id, em.nome
                         ORDER BY COUNT(*) DESC
                         LIMIT 3;
-                        "
+                        """
             gosto_musical = DBConnection.query(sql, True)
             if gosto_musical == -1:
                 return False
             otherUser["musical_taste"] = [genero[0] for genero in gosto_musical]
-        return otherUsers
+
+            otherDicts.append(otherUser)
+        return otherDicts
     
     @staticmethod
-    def others_to_dict(self, id: int):
-        user = Usuario.where({"id": id})
+    def others_to_dict(id: int):
+        user = Usuario.where({"id": id})[0]
         return {
             "id": user.id,
             "nome": user.nome,
-            "redes_sociais": Usuario.findSocialMedia(user.email),
+            "redes_sociais": Usuario.findSocialMedia(f"'{user.email}'"),
 
         }
+    
+print(Usuario.get_connections(4))
