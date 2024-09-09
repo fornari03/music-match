@@ -146,7 +146,6 @@ class HomeScreen(MDScreen):
         self.dialog.dismiss()
 
     def save_evaluations(self):
-        # TODO: ver se vale a pena verificar se houve alguma alteração de fato
         self.dialog = MDDialog(
             text="Salvar avaliações?",
             buttons=[
@@ -165,11 +164,38 @@ class HomeScreen(MDScreen):
         self.dialog.open()
 
     def confirm_save(self):
-        # TODO: implementar lógica de salvar alterações das avaliações com o API do backend
-        # TODO: bloquear a interface por um tempo até receber tudo do banco de dados de novo
+        erro = False
+        for music_id, evaluation in self.changed_evaluation.items():
+            achou = False
+            for music in self.evaluated:
+                if music['id'] == music_id:
+                    if music['evaluation'] != evaluation:
+                        if evaluation != 'N':
+                            ret = Musica.updateFeedback(music_id, usuario_logado.id, evaluation)
+                            if not ret:
+                                erro = True
+                        else:
+                            ret = Musica.removeFeedback(music_id, usuario_logado.id)
+                            if not ret:
+                                erro = True
+                    achou = True
+                    break
+            if not achou:
+                if evaluation == 'L':
+                    ret = Musica.createFeedback(music_id, usuario_logado.id, True)
+                    if not ret:
+                        erro = True
+                elif evaluation == 'D':
+                    ret = Musica.createFeedback(music_id, usuario_logado.id, False)
+                    if not ret:
+                        erro = True
         self.dialog.dismiss()
-        self.show_music_list()
-        print(self.changed_evaluation)      # dicionario com alterações de avaliação no formato id_musica: 'CHAR_AVALIAÇÃO'
+
+        if erro:
+            self.dialog = MDDialog(text="Ocorreu um erro ao salvar uma ou mais operações.").open()
+            
+        self.on_pre_enter()     # VERIFICAR SE FUNCIONA E FAZ SENTIDO
+        # TODO: bloquear a interface por um tempo até receber tudo do banco de dados de novo
 
 
 
