@@ -2,13 +2,14 @@ from kivymd.uix.screen import MDScreen
 from kivymd.uix.dialog import MDDialog
 
 from src.models.usuario import Usuario
+from ..utils.encrypt import encrypt_password
 
 class LoginScreen(MDScreen):
     def login(self):
         global usuario_logado
         usuario_logado = Usuario.where({"email": email})
 
-        email = self.ids.email.text
+        email = encrypt_password(self.ids.email.text)
         senha = self.ids.senha.text
         if usuario_logado == False:
             self.dialog = MDDialog(title="Erro", text="Email não cadastrado", size_hint=(0.7, 0.2))
