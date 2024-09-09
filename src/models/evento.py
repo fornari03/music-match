@@ -1,5 +1,5 @@
 from ..services.connect import DBConnection
-import Usuario
+from ..models.usuario import Usuario
 
 class Evento:
 
@@ -34,12 +34,20 @@ class Evento:
     def save(self):
         if self.nome == None:
             self.nome = "NULL"
+        elif self.nome[0] != "'" and self.nome[-1] != "'":
+            self.nome = f"'{self.nome}'"
         if self.descricao == None:
             self.descricao = "NULL"
+        elif self.descricao[0] != "'" and self.descricao[-1] != "'":
+            self.descricao = f"'{self.descricao}'"
         if self.localizacao == None:
             self.localizacao = "NULL"
+        elif self.localizacao[0] != "'" and self.localizacao[-1] != "'":
+            self.localizacao = f"'{self.localizacao}'"
         if self.data_realizacao == None:
             self.data_realizacao = "NULL"
+        elif self.data_realizacao[0] != "'" and self.data_realizacao[-1] != "'":
+            self.data_realizacao = f"'{self.data_realizacao}'"
         
 
         if self.__isnew:
