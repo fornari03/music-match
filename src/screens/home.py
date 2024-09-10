@@ -24,8 +24,8 @@ class HomeScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.music_icons = {}
-        self.showing_users_connected = True
-        self.showing_evaluated_musics = True
+        self.showing_users_connected = False
+        self.showing_evaluated_musics = False
         self.showing_future_events = True
 
     ############################## Tela de Início ##############################
