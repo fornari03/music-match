@@ -285,3 +285,45 @@ class Evento:
         if query_ans == -1:
             return False
         return query_ans
+    
+    @staticmethod
+    def get_eventos(idUsuario: int, conexoes: list[dict]):
+        eventos = Evento.where({})
+        if eventos == False:
+            return False
+        
+        for evento in eventos:
+            evento = evento.__dict__
+            evento["estilos"] = [estilo[0] for estilo in Evento.getEstilosMusicais(evento["id"])]
+            evento["artistas"] = [artista[0] for artista in Evento.getArtists(evento["id"])]
+            if evento["data_realizacao"] >= date.now():
+                for conexao in conexoes:
+                    interesse = Evento.findTemInteresse(conexao["id"], evento["id"])
+                    if interesse == False:
+                        return False
+                    if len(interesse) == 1:
+                        evento["conexoes_interessadas"].append(conexao)
+                status = Evento.findTemInteresse(idUsuario, evento["id"])
+                if status == False:
+                    return False
+                if len(status) == 1:
+                    evento["status"] = "I"
+                else:
+                    evento["status"] = "N"
+                
+            else:
+                for conexao in conexoes:
+                    participacao = Evento.findParticipouDe(conexao["id"], evento["id"])
+                    if participacao == False:
+                        return False
+                    if len(participacao) == 1:
+                        evento["conexoes_foram"].append(conexao)
+                status = Evento.findParticipouDe(idUsuario, evento["id"])
+                if status == False:
+                    return False
+                if len(status) == 1:
+                    evento["status"] = "P"
+                else:
+                    evento["status"] = "N"
+        
+        return eventos
