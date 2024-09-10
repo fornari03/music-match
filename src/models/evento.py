@@ -96,7 +96,9 @@ class Evento:
         for inst in lines:
             new_obj = Evento()
             new_obj.__setIsNew(False)
-            read_data = {"id": inst[0], "nome": inst[1], "descricao":inst[2], "localizacao": inst[3], "data_realizacao": inst[4], "imagem": inst[5]}
+            with open (f"images/imagem_evento_{inst[0]}.jpg", 'wb') as arquivo:
+                arquivo.write(inst[5])
+            read_data = {"id": inst[0], "nome": inst[1], "descricao": inst[2], "localizacao": inst[3], "data_realizacao": inst[4], "imagem": f'images/imagem_evento_{inst[0]}.jpg'}
             new_obj.change_values(read_data)
 
             obj.append(new_obj)
