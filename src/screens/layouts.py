@@ -42,15 +42,32 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
-        MDTextField:
-            id: senha
-            hint_text: "Senha"
-            icon_right: "lock"
-            password: True
-            mode: "rectangle"
+        MDRelativeLayout:
             size_hint_x: None
             width: 300
-            pos_hint: {"center_x": 0.5}
+            height: 50
+            pos_hint: {'center_x':.5, 'center_y':.5}
+
+            MDTextField:
+                id: senha
+                hint_text: "Senha"
+                password: True
+                mode: "rectangle"
+                size_hint_x: None
+                pos_hint: {"center_y": .5}
+                width: 300
+                on_text:
+                    self.text = self.text.replace(" ", "")
+
+            MDIconButton:
+                id: eye
+                icon: "eye-off"
+                icon_color: app.theme_cls.primary_color
+                pos_hint: {"center_y": .5}
+                pos: (senha.width - self.width, 0)
+                on_release:
+                    self.icon = "eye" if self.icon == "eye-off" else "eye-off"
+                    senha.password ^= 1
         MDRaisedButton:
             text: "Login"
             md_bg_color: (1, 0, 1, 1)
@@ -332,8 +349,7 @@ MDScreenManager:
                 id: senha
                 hint_text: "Senha"
                 password: True
-                max_text_length: 10
-                helper_text: "Mínimo de 6 caracteres e máximo de 10"
+                helper_text: "Mínimo de 5 caracteres"
                 helper_text_mode: "on_error"
                 mode: "rectangle"
                 size_hint_x: None

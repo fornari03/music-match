@@ -601,13 +601,13 @@ class HomeScreen(MDScreen):
                         text="Sim",
                         theme_text_color="Custom",
                         text_color=self.theme_cls.primary_color,
-                        on_release=lambda x: self.confirm_save())]
+                        on_release=lambda x: self.confirm_save_perfil())]
             )
             self.dialog.open()
         else:
-            self.confirm_save()
+            self.confirm_save_perfil()
 
-    def confirm_save(self):
+    def confirm_save_perfil(self):
         self.dialog.dismiss()
         
         nome = self.ids.nome.text.strip()
