@@ -39,6 +39,14 @@ class HomeScreen(MDScreen):
         self.connected = Usuario.get_connections(login.usuario_logado.id)
         self.not_connected = Usuario.get_not_connections(login.usuario_logado.id)
 
+        # informacoes do perfil
+        self.ids.nome.text = login.usuario_logado.nome
+        self.ids.email.text = login.usuario_logado.email
+        self.ids.data_nascimento.text = login.usuario_logado.data_nascimento.strftime("%d/%m/%Y")
+        self.data_nascimento = login.usuario_logado.data_nascimento
+        self.ids.senha.text = ""
+        # TODO pegar as redes sociais da pessoa
+
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
 
         self.show_music_list()
