@@ -220,36 +220,6 @@ MDScreenManager:
                 MDScrollView:
                     MDList:
                         id: lista_opcoes
-                        OneLineIconListItem:
-                            on_press: root.checkbox_selected(1)
-                            MDCheckbox:
-                                id: checkbox_1
-                                size_hint_x: None
-                                pos_hint: {"center_y": 0.5}
-                            MDTextField:
-                                hint_text: "Facebook"
-                                size_hint_x: 0.6
-                                pos_hint: {"center_y": 0.5, "center_x": 0.5}
-                        OneLineIconListItem:
-                            on_press: root.checkbox_selected(2)
-                            MDCheckbox:
-                                id: checkbox_2
-                                size_hint_x: None
-                                pos_hint: {"center_y": 0.5}
-                            MDTextField:
-                                hint_text: "Instagram"
-                                size_hint_x: 0.6
-                                pos_hint: {"center_y": 0.5, "center_x": 0.5}
-                        OneLineIconListItem:
-                            on_press: root.checkbox_selected(3)
-                            MDCheckbox:
-                                id: checkbox_3
-                                size_hint_x: None
-                                pos_hint: {"center_y": 0.5}
-                            MDTextField:
-                                hint_text: "Twitter"
-                                size_hint_x: 0.6
-                                pos_hint: {"center_y": 0.5, "center_x": 0.5}
                 MDGridLayout:
                     cols: 3
                     spacing: dp(20)

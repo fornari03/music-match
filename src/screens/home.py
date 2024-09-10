@@ -32,8 +32,6 @@ class HomeScreen(MDScreen):
 
     def on_pre_enter(self):
         """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
-        # TODO: implementar lógica de receber os dados do usuário que fez o login com a API do backend
-
         self.evaluated, self.not_evaluated = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
         self.connected = Usuario.get_connections(login.usuario_logado.id)
         self.not_connected = Usuario.get_not_connections(login.usuario_logado.id)
@@ -44,7 +42,12 @@ class HomeScreen(MDScreen):
         self.ids.data_nascimento.text = login.usuario_logado.data_nascimento.strftime("%d/%m/%Y")
         self.data_nascimento = login.usuario_logado.data_nascimento
         self.ids.senha.text = ""
-        # TODO pegar as redes sociais da pessoa
+        self.user_redes_sociais = Usuario.findSocialMedia(login.usuario_logado.id)
+        if not self.user_redes_sociais:
+            self.dialog = MDDialog(text="Erro ao buscar as redes sociais do usuário.").open()
+        else:
+            for rede_social in self.user_redes_sociais:
+                self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
 
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
         self.events = Evento.get_eventos(login.usuario_logado.id, self.connected)
@@ -605,6 +608,8 @@ class HomeScreen(MDScreen):
             )
             self.dialog.open()
         else:
+            self.dialog = MDDialog(text="Ocorreu um erro inesperado.")
+            self.confirm_save()
             self.confirm_save_perfil()
 
     def confirm_save_perfil(self):
@@ -614,7 +619,30 @@ class HomeScreen(MDScreen):
         email = self.ids.email.text.strip()
         data_nascimento = self.data_nascimento
         senha = self.ids.senha.text.strip()
-        lista_redes_sociais = [(child.children[0].hint_text.strip(), child.children[0].text.strip()) for child in self.ids.lista_opcoes.children if child.children[1].active and child.children[0].text.strip() != ""] # lista de tuplas (nome_rede_social, usuario) habilitados e preenchidos
+        lista_redes_sociais = [(child.children[0].hint_text.strip(), child.children[0].text.strip(), child.children[1].active) for child in self.ids.lista_opcoes.children]
+        for rede_social in lista_redes_sociais:
+            if rede_social[2]:
+                if rede_social[0].strip() == "" or rede_social[1].strip() == "":
+                    self.dialog = MDDialog(text="Preencha todos os campos das redes sociais marcadas para salvar.").open()
+                    return
+                else:
+                    if (rede_social[0], rede_social[1]) not in self.user_redes_sociais:
+                        if rede_social[1] in [rs[1] for rs in self.user_redes_sociais]:
+                            ret = Usuario.editSocialMediaUsername(login.usuario_logado.id, rede_social[0], rede_social[1])
+                            if not ret:
+                                self.dialog = MDDialog(text="Erro ao salvar os dados no banco de dados.").open()
+                                return
+                        else:
+                            ret = Usuario.addSocialMedia(login.usuario_logado.id, rede_social[0], rede_social[1])
+                            if not ret:
+                                self.dialog = MDDialog(text="Erro ao salvar os dados no banco de dados.").open()
+                                return
+            else:
+                if (rede_social[0], rede_social[1]) in self.user_redes_sociais:
+                    ret = Usuario.deleteSocialMedia(login.usuario_logado.id, rede_social[0])
+                    if not ret:
+                        self.dialog = MDDialog(text="Erro ao salvar os dados no banco de dados.").open()
+
 
         changes = {}
         if nome != login.usuario_logado.nome:
@@ -628,13 +656,19 @@ class HomeScreen(MDScreen):
 
         if senha != "":
             changes["nova_senha"] = senha
-
-        #TODO pegar as redes sociais
         
         login.usuario_logado.change_values(changes)
         if not login.usuario_logado.save():
             self.dialog = MDDialog(text="Erro ao salvar os dados no banco de dados.").open()
             return
+
+        self.ids.lista_opcoes.clear_widgets()
+        self.user_redes_sociais = Usuario.findSocialMedia(login.usuario_logado.id)
+        if not self.user_redes_sociais:
+            self.dialog = MDDialog(text="Erro ao buscar as redes sociais do usuário.").open()
+        else:
+            for rede_social in self.user_redes_sociais:
+                self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
 
         # nao precisa reescrever os campos pq eh literalmente o que ja ta escrito la
         self.dialog = MDDialog(text="Dados atualizados com sucesso!").open()
@@ -679,11 +713,11 @@ class HomeScreen(MDScreen):
         self.manager.current = "login_screen"
         # TODO: implementar lógica de exclusão de conta com o API do backend
 
-    def add_social_media_item(self, social_media: str):
+    def add_social_media_item(self, social_media: str, user_social_media: str="", checked: bool=False):
         new_item = OneLineIconListItem(on_press=lambda x: self.checkbox_selected(len(self.ids.lista_opcoes.children)))
-        
-        new_item.add_widget(MDCheckbox(size_hint_x=None, pos_hint={"center_y": 0.5}))
-        new_item.add_widget(MDTextField(hint_text=social_media, size_hint_x=0.6, pos_hint={"center_y": 0.5, "center_x": 0.5}))
+
+        new_item.add_widget(MDCheckbox(size_hint_x=None, pos_hint={"center_y": 0.5}, active=checked))
+        new_item.add_widget(MDTextField(hint_text=social_media.strip(), text=user_social_media.strip(), size_hint_x=0.6, pos_hint={"center_y": 0.5, "center_x": 0.5}))
         
         self.ids.lista_opcoes.add_widget(new_item)
 

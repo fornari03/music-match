@@ -136,10 +136,12 @@ class Usuario:
     def addSocialMedia(id: int, socMed: str, userSocMed: str):
         user = Usuario.where({"id": id})
 
+        # deveria ter um check bonitinho pra ver se tem as aspas simples, mas fazer o que
+
         if user == False:
             return False
 
-        sql = f"INSERT INTO redes_sociais(id_usuario, rede_social, usuario_rede_social) VALUES ({id}, {socMed}, {userSocMed})"
+        sql = f"INSERT INTO redes_sociais(id_usuario, rede_social, usuario_rede_social) VALUES ('{id}', '{socMed}', '{userSocMed}')"
 
         if DBConnection.query(sql, False) == -1:
             return False
@@ -152,7 +154,7 @@ class Usuario:
         if user == False:
             return False
 
-        sql = f"UPDATE redes_sociais SET usuario_rede_social={userSocMed} WHERE id_usuario={id} AND rede_social={socMed}"
+        sql = f"UPDATE redes_sociais SET usuario_rede_social={userSocMed} WHERE id_usuario={id} AND rede_social='{socMed}'"
         if DBConnection.query(sql, False) == -1:
             return False
         return True
@@ -164,7 +166,7 @@ class Usuario:
         if user == False:
             return False
 
-        sql = f"DELETE FROM redes_sociais WHERE id_usuario={id} AND rede_social={socMed}"
+        sql = f"DELETE FROM redes_sociais WHERE id_usuario={id} AND rede_social='{socMed}'"
         if DBConnection.query(sql, False) == -1:
             return False
         return True
