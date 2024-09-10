@@ -46,9 +46,9 @@ class HomeScreen(MDScreen):
         self.show_connections_grid()
 
         self.events = [
-            {"id": 1, "name": "HH Ceubinho", "descricao": "HH do Ceubinho é o melhor que tem uau que festa legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-09-12 19:00:00", "conexoes_interessadas": [self.connected[0]], "image": "screens/imagem.jpg", "status": "I", "artistas": ["artista1"], "generos": ["Funk", "Pop"]},
+            {"id": 1, "name": "HH Ceubinho", "descricao": "HH do Ceubinho é o melhor que tem uau que festa legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-09-12 19:00:00", "conexoes_interessadas": [], "image": "screens/imagem.jpg", "status": "I", "artistas": ["artista1"], "generos": ["Funk", "Pop"]},
             {"id": 2, "name": "Show Bruno Mars", "descricao": "O Bruninho vem para Brasília ebaaaaaaaaaaa.", "localizacao": "Estádio Mané Garrinhcha", "data": "2024-10-26 18:00:00", "conexoes_interessadas": self.connected, "image": "screens/imagem.jpg", "status": "N", "artistas": ["Bruno Mars"], "generos": ["Pop"]},
-            {"id": 3, "name": "Festa do Calouro", "descricao": "Festa do Calouro da UnB, vai ser muito legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-08-12 19:00:00", "conexoes_foram": [self.connected[0]], "image": "screens/imagem.jpg", "status": "P", "artistas": ["artista1", "artista2"], "generos": ["Funk", "Pop"]},
+            {"id": 3, "name": "Festa do Calouro", "descricao": "Festa do Calouro da UnB, vai ser muito legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-08-12 19:00:00", "conexoes_foram": [], "image": "screens/imagem.jpg", "status": "P", "artistas": ["artista1", "artista2"], "generos": ["Funk", "Pop"]},
         ]
 
         self.show_events_grid()
@@ -368,7 +368,7 @@ class HomeScreen(MDScreen):
 
         box_layout.add_widget(MDLabel(text=connection['nome'], size_hint=(0.9, 0.1), bold=True))
 
-        box_layout.add_widget(MDLabel(text="    //    ".join(connection['redes_sociais']), size_hint=(0.9, 0.2)))
+        box_layout.add_widget(MDLabel(text="    //    ".join([": ".join([rd, ru]) for rd, ru in connection['redes_sociais']]), size_hint=(0.9, 0.2)))
 
         box_layout.add_widget(MDLabel(text=f"Gosto musical: {', '.join([genero for genero in connection['musical_taste']])}", size_hint=(0.9, 0.1)))
 
@@ -503,12 +503,13 @@ class HomeScreen(MDScreen):
 
     def on_save(self, instance, value, date_range):
         self.ids.data_nascimento.text = value.strftime("%d/%m/%Y")
+        self.data_nascimento = value
 
     def save(self):
         # TODO: verificar se campos estão preenchidos e são válidos
         nome = self.ids.nome.text.strip()
         email = self.ids.email.text.strip()
-        data_nascimento = self.ids.data_nascimento.text.strip()
+        data_nascimento = self.data_nascimento.strftime("%Y-%m-%d")
         senha = self.ids.senha.text.strip()
         lista_redes_sociais = [(child.children[0].hint_text.strip(), child.children[0].text.strip()) for child in self.ids.lista_opcoes.children if child.children[1].active and child.children[0].text.strip() != ""] # lista de tuplas (nome_rede_social, usuario) habilitados e preenchidos
         # TODO: implementar lógica de edição dos dados com o API do backend
@@ -534,6 +535,11 @@ class HomeScreen(MDScreen):
 
     def confirm_delete(self):
         self.dialog.dismiss()
+
+        if not Usuario.delete(login.usuario_logado.id):
+            self.dialog = MDDialog(text="Ocorreu um erro ao deletar o usuario.").open()
+            return
+
         self.dialog = MDDialog(
             text="Conta excluída com sucesso!",
             buttons=[
