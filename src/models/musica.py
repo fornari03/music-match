@@ -1,4 +1,6 @@
 from ..services.connect import DBConnection
+from .usuario import Usuario
+from random import shuffle
 
 class Musica:
 
@@ -35,7 +37,7 @@ class Musica:
         if self.__isNew:
             sql = f"INSERT INTO musica (nome, capa, link_spotify) VALUES ({self.nome}, {self.capa}, {self.link_spotify})"
         else:
-            sql = f"UPDATE musica SET nome={self.nome}, capa={self.capa}, link_spotify={self.link_spotify} WHERE id={self.id}"
+            sql = f"UPDATE musica SET nome={self.nome}, capa=({self.capa}), link_spotify={self.link_spotify} WHERE id={self.id}"
 
         if DBConnection.query(sql, False) == -1:
             return False        
@@ -102,20 +104,22 @@ class Musica:
         for inst in lines_feedback:
             new_obj = Musica()
             new_obj.__isNew = False
-            read_data = {"id": inst[0], "nome": inst[1], "capa": inst[2], "link_spotify": inst[3]}
-            new_obj.change_values(read_data)
+            with open (f"images/imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
+                arquivo.write(inst[2])
+            read_data = {"id": inst[0], "nome": inst[1], "capa": f'images/imagem_musica_{inst[0]}.jpg', "link_spotify": inst[3]}
 
             # feedback positivo: True, negativo: False
-            feedback_list.append((new_obj, inst[4]))
+            feedback_list.append((read_data, inst[4]))
         
         no_feedback_list = []
         for inst in lines_no_feedback:
             new_obj = Musica()
             new_obj.__isNew = False
-            read_data = {"id": inst[0], "nome": inst[1], "capa": inst[2], "link_spotify": inst[3]}
-            new_obj.change_values(read_data)
+            with open (f"images/imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
+                arquivo.write(inst[2])
+            read_data = {"id": inst[0], "nome": inst[1], "capa": f"images/imagem_musica_{inst[0]}.jpg", "link_spotify": inst[3]}
 
-            no_feedback_list.append(new_obj)
+            no_feedback_list.append(read_data)
 
         return feedback_list, no_feedback_list
     
@@ -137,6 +141,15 @@ class Musica:
             return False
         return True
     
+    # atualiza o feedback do usuario idUser para a musica idMusic
+    @staticmethod
+    def updateFeedback(idMusic: int, idUser: int, feedback: bool):
+        sql = f"UPDATE usuario_avalia_musica SET feedback = {feedback} WHERE id_usuario = {idUser} AND id_musica = {idMusic}"
+        
+        if DBConnection.query(sql, False) == -1:
+            return False
+        return True
+    
     # pega os estilos musicais de uma musica
     @staticmethod
     def getEstilosMusicais(idMusic: int):
@@ -146,3 +159,55 @@ class Musica:
         if query_ans == -1:
             return False
         return query_ans
+
+
+    @staticmethod
+    def getEvaluatedAndNotEvaluatedMusics(idUser: int):
+        user = Usuario.where({"id": idUser})
+        if user == False:
+            return False
+        musicas = Musica.classifyMusic(idUser)
+        if musicas == False:
+            return False
+        musicas_avaliadas = musicas[0]
+        musicas_nao_avaliadas = musicas[1]
+        avaliadas = []
+        nao_avaliadas = []
+
+        for musica_avaliada in musicas_avaliadas:
+            musica = musica_avaliada[0]
+            musica['evaluation'] = 'L' if musica_avaliada[1] else 'D'
+            musica['artista'] = [artista[0] for artista in Musica.getArtistsName(musica['id'])]
+            musica['estilo'] = [genero[0] for genero in Musica.getEstilosMusicais(musica['id'])]
+            avaliadas.append(musica)
+
+        for musica_nao_avaliada in musicas_nao_avaliadas:
+            musica = musica_nao_avaliada
+            musica['artista'] = [artista[0] for artista in Musica.getArtistsName(musica['id'])]
+            musica['estilo'] = [genero[0] for genero in Musica.getEstilosMusicais(musica['id'])]
+            nao_avaliadas.append(musica)
+
+        shuffle(avaliadas)
+        shuffle(nao_avaliadas)
+        return avaliadas, nao_avaliadas
+    
+'''
+#codigo pra botar imagem
+from ..services.config import load_config
+import psycopg2
+
+with open ("src/screens/Fragil-cover.jpg", 'rb') as arquivo:
+    x = arquivo.read()
+
+conn = psycopg2.connect(**load_config())
+
+# cursor para realizar operacoes no banco de dados, parece que eh necessario
+curs = conn.cursor()
+
+# executa o comando fornecido
+curs.execute("UPDATE musica SET capa=(%s) WHERE id=1;", (x,))
+
+conn.commit()
+curs.close()
+conn.close()
+'''
