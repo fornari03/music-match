@@ -119,15 +119,13 @@ class Usuario:
     # userSocMed = usuario naquela rede social
 
     @staticmethod
-    def findSocialMedia(email: str):
-        user = Usuario.where({"email": email})
+    def findSocialMedia(id: int):
+        user = Usuario.where({"id": id})
 
         if user == False:
             return False
 
-        idUser = user[0].id
-
-        sql = f"SELECT rede_social, usuario_rede_social FROM redes_sociais WHERE id_usuario={idUser}"
+        sql = f"SELECT rede_social, usuario_rede_social FROM redes_sociais WHERE id_usuario={id}"
 
         data = DBConnection.query(sql, True)
         if data == -1:
@@ -135,44 +133,38 @@ class Usuario:
         return data    
     
     @staticmethod
-    def addSocialMedia(email: str, socMed: str, userSocMed: str):
-        user = Usuario.where({"email": email})
+    def addSocialMedia(id: int, socMed: str, userSocMed: str):
+        user = Usuario.where({"id": id})
 
         if user == False:
             return False
 
-        idUser = user[0].id
-
-        sql = f"INSERT INTO redes_sociais(id_usuario, rede_social, usuario_rede_social) VALUES ({idUser}, {socMed}, {userSocMed})"
+        sql = f"INSERT INTO redes_sociais(id_usuario, rede_social, usuario_rede_social) VALUES ({id}, {socMed}, {userSocMed})"
 
         if DBConnection.query(sql, False) == -1:
             return False
         return True
     
     @staticmethod
-    def editSocialMediaUsername(email: str, socMed: str, userSocMed: str):
-        user = Usuario.where({"email": email})
+    def editSocialMediaUsername(id: int, socMed: str, userSocMed: str):
+        user = Usuario.where({"id": id})
 
         if user == False:
             return False
 
-        idUser = user[0].id
-
-        sql = f"UPDATE redes_sociais SET usuario_rede_social={userSocMed} WHERE id_usuario={idUser} AND rede_social={socMed}"
+        sql = f"UPDATE redes_sociais SET usuario_rede_social={userSocMed} WHERE id_usuario={id} AND rede_social={socMed}"
         if DBConnection.query(sql, False) == -1:
             return False
         return True
     
     @staticmethod
-    def deleteSocialMedia(email: str, socMed: str):
-        user = Usuario.where({"email": email})
+    def deleteSocialMedia(id: int, socMed: str):
+        user = Usuario.where({"id": id})
 
         if user == False:
             return False
 
-        idUser = user[0].id
-
-        sql = f"DELETE FROM redes_sociais WHERE id_usuario={idUser} AND rede_social={socMed}"
+        sql = f"DELETE FROM redes_sociais WHERE id_usuario={id} AND rede_social={socMed}"
         if DBConnection.query(sql, False) == -1:
             return False
         return True
@@ -213,22 +205,20 @@ class Usuario:
     # encontra as conexoes de um usuario
     # da pra gente fazer um join table pra gente retornar os emails, mas por enquanto so retorna os ids
     @staticmethod
-    def findConnections(email: str):
-        user = Usuario.where({"email": email})
+    def findConnections(id: int):
+        user = Usuario.where({"id": id})
 
         if user == False:
             return False
 
-        idUser = user[0].id
-
-        sql = f"""SELECT u.id, u.nome, music_match.sintonia FROM calcular_sintonia_musical({idUser}) music_match JOIN usuario u ON music_match.id_usuario=u.id
+        sql = f"""SELECT u.id, u.nome, music_match.sintonia FROM calcular_sintonia_musical({id}) music_match JOIN usuario u ON music_match.id_usuario=u.id
                     WHERE music_match.id_usuario IN (
                         SELECT 
                             CASE 
-                            WHEN {idUser}=cc.id_usuario_1 THEN cc.id_usuario_2 
+                            WHEN {id}=cc.id_usuario_1 THEN cc.id_usuario_2 
                             ELSE cc.id_usuario_1 
                             END 
-                        FROM conecta_com cc WHERE cc.id_usuario_1={idUser} OR cc.id_usuario_2={idUser})
+                        FROM conecta_com cc WHERE cc.id_usuario_1={id} OR cc.id_usuario_2={id})
                     ORDER BY music_match.sintonia DESC"""
         
         query_ret = DBConnection.query(sql, True)
@@ -238,22 +228,20 @@ class Usuario:
     
 
     @staticmethod
-    def findNotConnections(email: str):
-        user = Usuario.where({"email": email})
+    def findNotConnections(id: int):
+        user = Usuario.where({"id": id})
 
         if user == False:
             return False
 
-        idUser = user[0].id
-
-        sql = f"""SELECT u.id, u.nome, music_match.sintonia FROM calcular_sintonia_musical({idUser}) music_match JOIN usuario u ON music_match.id_usuario=u.id
+        sql = f"""SELECT u.id, u.nome, music_match.sintonia FROM calcular_sintonia_musical({id}) music_match JOIN usuario u ON music_match.id_usuario=u.id
                     WHERE music_match.id_usuario NOT IN (
                         SELECT 
                             CASE 
-                            WHEN {idUser}=cc.id_usuario_1 THEN cc.id_usuario_2 
+                            WHEN {id}=cc.id_usuario_1 THEN cc.id_usuario_2 
                             ELSE cc.id_usuario_1 
                             END 
-                        FROM conecta_com cc WHERE cc.id_usuario_1={idUser} OR cc.id_usuario_2={idUser})
+                        FROM conecta_com cc WHERE cc.id_usuario_1={id} OR cc.id_usuario_2={id})
                     ORDER BY music_match.sintonia DESC"""
         
         query_ret = DBConnection.query(sql, True)
@@ -267,7 +255,7 @@ class Usuario:
         if user == False:
             return False
         
-        otherUsers = Usuario.findConnections(f"'{user[0].email}'")
+        otherUsers = Usuario.findConnections(f"'{id}'")
         if otherUsers == False:
             return False
         
@@ -313,7 +301,7 @@ class Usuario:
         if user == False:
             return False
         
-        otherUsers = Usuario.findNotConnections(f"'{user[0].email}'")
+        otherUsers = Usuario.findNotConnections(f"'{id}'")
         if otherUsers == False:
             return False
         
@@ -359,6 +347,6 @@ class Usuario:
         return {
             "id": user.id,
             "nome": user.nome,
-            "redes_sociais": Usuario.findSocialMedia(f"'{user.email}'"),
+            "redes_sociais": Usuario.findSocialMedia(f"'{user.id}'"),
 
         }
