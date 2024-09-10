@@ -37,7 +37,7 @@ class Musica:
         if self.__isNew:
             sql = f"INSERT INTO musica (nome, capa, link_spotify) VALUES ({self.nome}, {self.capa}, {self.link_spotify})"
         else:
-            sql = f"UPDATE musica SET nome={self.nome}, capa={self.capa}, link_spotify={self.link_spotify} WHERE id={self.id}"
+            sql = f"UPDATE musica SET nome={self.nome}, capa=({self.capa}), link_spotify={self.link_spotify} WHERE id={self.id}"
 
         if DBConnection.query(sql, False) == -1:
             return False        
@@ -187,4 +187,26 @@ class Musica:
             musica['estilo'] = [genero[0] for genero in Musica.getEstilosMusicais(musica['id'])]
             nao_avaliadas.append(musica)
 
-        return shuffle(avaliadas), shuffle(nao_avaliadas)
+        shuffle(avaliadas)
+        shuffle(nao_avaliadas)
+        return avaliadas, nao_avaliadas
+    
+'''
+from ..services.config import load_config
+import psycopg2
+
+with open ("src/screens/imagem.jpg", 'rb') as arquivo:
+    x = arquivo.read()
+
+conn = psycopg2.connect(**load_config())
+
+# cursor para realizar operacoes no banco de dados, parece que eh necessario
+curs = conn.cursor()
+
+# executa o comando fornecido
+curs.execute("UPDATE musica SET capa=(%s) WHERE id=3;", (x,))
+
+conn.commit()
+curs.close()
+conn.close()
+'''

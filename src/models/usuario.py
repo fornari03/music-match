@@ -24,11 +24,16 @@ class Usuario:
             elif key == "email":
                 self.email = data[key]
             elif key == "senha":
-                self.senha = encrypt_password(data[key])
+                if self.__isnew:
+                    self.senha = encrypt_password(data[key])
+                else:
+                    self.senha = data[key]
             elif key == "data_nascimento":
                 self.data_nascimento = data[key]
             elif key == "foto_perfil":
                 self.foto_perfil = data[key]
+            elif key == "nova_senha":
+                self.senha = encrypt_password(data[key])
     
     # metodo privado pra dizer se uma instancia desse objeto foi criada pelo programa (True) ou se foi importada do BD (False)
     def __setIsNew(self, val: bool):

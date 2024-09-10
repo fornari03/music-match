@@ -54,7 +54,7 @@ class HomeScreen(MDScreen):
         self.show_events_grid()
 
     def add_music_item(self, music):
-        item = TwoLineAvatarIconListItem(text=f"{music['nome']} - {', '.join(music['genero'])}", secondary_text=f"{', '.join(music['artista'])}")
+        item = TwoLineAvatarIconListItem(text=f"{music['nome']} - {', '.join(music['estilo'])}", secondary_text=f"{', '.join(music['artista'])}")
         
         capa = ImageLeftWidget(source=music['capa'])
         item.add_widget(capa)
@@ -109,12 +109,12 @@ class HomeScreen(MDScreen):
         self.ids.music_list.clear_widgets()
         if not self.showing_evaluated_musics:
             for music in self.not_evaluated:
-                if search_string is None or search_string.lower().strip() in music['nome'].lower().strip() or search_string.lower().strip() in " ".join(music['artista']).lower().strip() or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
+                if search_string is None or search_string.lower().strip() in music['nome'].lower().strip() or search_string.lower().strip() in " ".join(music['artista']).lower().strip() or search_string.lower().strip() in music['estilo'] or search_string.lower().strip() == "":
                     self.add_music_item(music)
 
         else:
             for music in self.evaluated:
-                if search_string is None or search_string.lower().strip() in music['nome'].lower().strip() or search_string.lower().strip() in " ".join(music['artista']).lower().strip() or search_string.lower().strip() in music['genero'] or search_string.lower().strip() == "":
+                if search_string is None or search_string.lower().strip() in music['nome'].lower().strip() or search_string.lower().strip() in " ".join(music['artista']).lower().strip() or search_string.lower().strip() in music['estilo'] or search_string.lower().strip() == "":
                     self.add_music_item(music)
 
     def switch_musics_view(self):
@@ -167,7 +167,7 @@ class HomeScreen(MDScreen):
                 if music['id'] == music_id:
                     if music['evaluation'] != evaluation:
                         if evaluation != 'N':
-                            ret = Musica.updateFeedback(music_id, login.usuario_logado.id, evaluation)
+                            ret = Musica.updateFeedback(music_id, login.usuario_logado.id, True if evaluation == 'L' else False)
                             if not ret:
                                 erro = True
                         else:
@@ -374,7 +374,7 @@ class HomeScreen(MDScreen):
 
         box_layout.add_widget(MDLabel(text=f"Artistas: {', '.join(connection['artists'])}", size_hint=(0.9, 0.2)))
 
-        box_layout.add_widget(MDLabel(text=f"Music Match: {connection['sintonia']}%", size_hint=(0.3, 0.1)))
+        box_layout.add_widget(MDLabel(text=f"Music Match: {connection['sintonia']:.1f}%", size_hint=(0.3, 0.1)))
 
         if status == "connected":
             disconnectButton = MDRoundFlatIconButton(text="Desconectar", size_hint=(0.25, None), icon="account-minus", icon_color="red", text_color="red", line_color="red")
