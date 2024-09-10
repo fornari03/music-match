@@ -413,13 +413,27 @@ class HomeScreen(MDScreen):
     def confirm_disconect(self, idx):
         """Método que apaga o MDCard da conexão com o usuário de índice idx no grid."""
         self.dialog.dismiss()
+        i = len(self.connected) - idx - 1
+        user = self.connected[i]
+        query_ret = Usuario.disconnect(login.usuario_logado.id, user['id'])
+        if not query_ret:
+            self.dialog = MDDialog(
+                text="Ocorreu um erro ao desconectar do usuário.",
+                buttons=[
+                    MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )])
+            self.dialog.open()
+            return
+    
         self.ids.connections_grid.remove_widget(self.ids.connections_grid.children[idx])
-        idx = len(self.connected) - idx - 1
-        user = self.connected[idx]
         self.not_connected.append(user)
-        self.connected.pop(idx)
+        self.not_connected.sort(key=lambda x: x['sintonia'], reverse=True)
+        self.connected.pop(i)
         self.show_connections_grid()
-        # TODO: implementar lógica de remoção de conexão com o API do backend
 
     def add_connection(self, banner):
         for i in range(len(self.ids.connections_grid.children)-1, -1, -1):
@@ -445,17 +459,30 @@ class HomeScreen(MDScreen):
     def confirm_connect(self, idx):
         """Método que adiciona o MDCard da conexão com o usuário de índice idx no grid."""
         self.dialog.dismiss()
+        i = len(self.not_connected) - idx - 1
+        user = self.not_connected[i]
+        query_ret = Usuario.connect(login.usuario_logado.id, user['id'])
+        if not query_ret:
+            self.dialog = MDDialog(
+                text="Ocorreu um erro ao conectar com o usuário.",
+                buttons=[
+                    MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+            )
+            self.dialog.open()
+            return
+
         self.ids.connections_grid.remove_widget(self.ids.connections_grid.children[idx])
-        idx = len(self.not_connected) - idx - 1
-        user = self.not_connected[idx]
         self.connected.append(user)
-        self.not_connected.pop(idx)
+        self.connected.sort(key=lambda x: x['sintonia'], reverse=True)
+        self.not_connected.pop(i)
         self.show_connections_grid()
-        # TODO: implementar lógica de adição de conexão com o API do backend
 
     def show_connections_grid(self, search_string=None):
-        # TODO: melhorar algoritmo de mostrar usuários conectados e não conectados,
-        # calcular e ordenar por music_match
         self.ids.connections_grid.clear_widgets()
         if self.showing_users_connected:
             for connection in self.connected:
