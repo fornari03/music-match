@@ -59,8 +59,18 @@ class SignUpScreen(MDScreen):
                 }
         
         user = Usuario()
+        verify_email = user.where({'email':data['email']})
+        
+        if verify_email == -1:
+            show_popup("Erro no banco de dados", "Erro ao salvar os dados, tente novamente!")
+            return
+
+        if len(verify_email) > 0:
+            show_popup("Erro: Email já cadastrado", "O email informado já foi cadastrado anteriormente!")
+            return
+        
         user.change_values(data)
-        if user.save():
+        if user.save() != -1:
             show_popup("Sucesso", "Cadastro realizado com sucesso!")
             self.manager.current = "login_screen"
         else:
