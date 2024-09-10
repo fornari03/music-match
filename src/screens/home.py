@@ -28,8 +28,6 @@ class HomeScreen(MDScreen):
         self.showing_evaluated_musics = False
         self.showing_future_events = True
 
-    ############################## Tela de Início ##############################
-
     def on_pre_enter(self):
         """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
         self.evaluated, self.not_evaluated = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
@@ -57,6 +55,17 @@ class HomeScreen(MDScreen):
         self.show_connections_grid()
 
         self.show_events_grid()
+
+
+
+
+
+
+
+
+
+
+    ############################## Tela de Início ##############################
 
     def add_music_item(self, music):
         item = TwoLineAvatarIconListItem(text=f"{music['nome']} - {', '.join(music['estilo'])}", secondary_text=f"{', '.join(music['artista'])}")
@@ -197,6 +206,11 @@ class HomeScreen(MDScreen):
             
         self.on_pre_enter()     # VERIFICAR SE FUNCIONA E FAZ SENTIDO
         # TODO: bloquear a interface por um tempo até receber tudo do banco de dados de novo
+
+
+
+
+
 
 
 
@@ -409,6 +423,11 @@ class HomeScreen(MDScreen):
 
 
 
+
+
+
+
+
     ############################## Tela de Conexões ##############################
 
     def add_connection_banner(self, connection, status):
@@ -566,6 +585,11 @@ class HomeScreen(MDScreen):
     def search_user(self, search_string):
         self.show_connections_grid(search_string)
         self.dialog.dismiss()
+
+
+
+
+
 
 
 
