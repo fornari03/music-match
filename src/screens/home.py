@@ -33,8 +33,6 @@ class HomeScreen(MDScreen):
     def on_pre_enter(self):
         """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
         # TODO: implementar lógica de receber os dados do usuário que fez o login com a API do backend
-        # TODO: implementar lógica de receber todos os eventos passados e futuros com a API do backend (ordem cronológica)
-        # TODO: implementar lógica de receber os usuários conectados e não conectados com a API do backend (ordem por music_match)
 
         self.evaluated, self.not_evaluated = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
         self.connected = Usuario.get_connections(login.usuario_logado.id)
@@ -295,7 +293,6 @@ class HomeScreen(MDScreen):
             for event in self.events:
                 if event['id'] == int(banner.id.split("_")[1]):
                     event['status'] = "I"
-                    # TODO: implementar lógica de marcar interesse com o API do backend
                     break
         else:
             marca_desinteresse = Evento.deleteTemInteresse(login.usuario_logado.id, int(banner.id.split("_")[1]))
@@ -316,7 +313,6 @@ class HomeScreen(MDScreen):
             for event in self.events:
                 if event['id'] == int(banner.id.split("_")[1]):
                     event['status'] = "N"
-                    # TODO: implementar lógica de marcar desinteresse com o API do backend
                     break
 
     def mark_presence(self, banner, interest_button, interest_label):
@@ -339,7 +335,6 @@ class HomeScreen(MDScreen):
             for event in self.events:
                 if event['id'] == int(banner.id.split("_")[1]):
                     event['status'] = "P"
-                    # TODO: implementar lógica de marcar presença com o API do backend
                     break
         else:
             marca_ausencia = Evento.deleteParticipouDe(login.usuario_logado.id, int(banner.id.split("_")[1]))
@@ -360,7 +355,6 @@ class HomeScreen(MDScreen):
             for event in self.events:
                 if event['id'] == int(banner.id.split("_")[1]):
                     event['status'] = "N"
-                    # TODO: implementar lógica de marcar ausência com o API do backend
                     break
 
     def show_events_grid(self, search_string=None):
