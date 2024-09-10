@@ -16,6 +16,9 @@ class Evento:
 
     # Troca os valores dos atributos
     def change_values(self, data:dict):
+        """
+        Muda os valores do evento para os valores passados no dicionario
+        """
         for key in data.keys():
             if key == 'id' and not self.__isnew:
                 self.id = data[key]
@@ -32,10 +35,16 @@ class Evento:
 
     # metodo privado pra dizer se uma instancia desse objeto foi criada pelo programa (True) ou se foi importada do BD (False)
     def __setIsNew(self, val: bool):
+        """
+        Método privado pra dizer se uma instancia desse objeto foi criada pelo programa (True) ou se foi importada do BD (False)
+        """
         self.__isnew = val
 
     # salva o objeto evento no banco de dados com os atributos que ele tem
     def save(self):
+        """
+        Metodo para salvar o evento no banco de dados
+        """
         if self.nome == None:
             self.nome = "NULL"
         elif self.nome[0] != "'" and self.nome[-1] != "'":
@@ -74,6 +83,9 @@ class Evento:
     # Lembra de colocar as aspas simples em volta dos valores que sao text la no BD
     @staticmethod
     def where(data: dict):
+        """
+        Metodo para buscar Eventos no banco de dados
+        """
         sql = "SELECT id, nome, descricao, localizacao, data_realizacao, imagem FROM evento "
         # se coloca parenteses entre os nomes da coluna o retorno eh uma string que quebra o codigo, n entendi direito o pq :)
 
@@ -112,6 +124,9 @@ class Evento:
 
     @staticmethod
     def findParticipouDe(idUser: int, idEvent: int):
+        """
+        Verifica se um usuario participou de um evento
+        """
         user = Usuario.where({"id": idUser})
 
         if user == False:
@@ -132,6 +147,9 @@ class Evento:
     
     @staticmethod
     def addParticipouDe(idUser: int, idEvent: int):
+        """
+        Adiciona um usuario a um evento como participante
+        """
         user = Usuario.where({"id": idUser})
 
         if user == False:
@@ -152,6 +170,9 @@ class Evento:
     
     @staticmethod
     def editParticipouDe(idUser: int, idEvent: int):
+        """
+        Atualiza a participacao de um usuario em um evento
+        """
         user = Usuario.where({"id": id})
 
         if user == False:
@@ -172,6 +193,9 @@ class Evento:
     
     @staticmethod
     def deleteParticipouDe(idUser: int, idEvent: int):
+        """
+        Deleta a participacao de um usuario em um evento
+        """
         user = Usuario.where({"id": idUser})
 
         if user == False:
@@ -194,6 +218,9 @@ class Evento:
 
     @staticmethod
     def findTemInteresse(idUser: int, idEvent: int):
+        """
+        Busca se um usuario tem interesse em um evento
+        """
         user = Usuario.where({"id": idUser})
 
         if user == False:
@@ -214,6 +241,9 @@ class Evento:
     
     @staticmethod
     def addTemInteresse(idUser: int, idEvent: int):
+        """
+        Adiciona um usuario a um evento como interessado
+        """
         user = Usuario.where({"id": idUser})
 
         if user == False:
@@ -234,6 +264,9 @@ class Evento:
     
     @staticmethod
     def editTemInteresse(idUser: int, idEvent: int):
+        """
+        Atualiiza o interesse de um usuario em um evento
+        """
         user = Usuario.where({"id": idUser})
 
         if user == False:
@@ -254,6 +287,9 @@ class Evento:
     
     @staticmethod
     def deleteTemInteresse(idUser: int, idEvent: int):
+        """
+        Deleta o interesse de um usuario em um evento
+        """
         user = Usuario.where({"id": idUser})
 
         if user == False:
@@ -274,6 +310,9 @@ class Evento:
     
     @staticmethod
     def getArtists(idEvento: int):
+        """
+        Retorna os artistas que vao participar de um evento
+        """
         sql = f"SELECT a.nome FROM artista a JOIN participa p ON a.id=p.id_artista WHERE p.id_evento={idEvento}"
 
         query_ans = DBConnection.query(sql, True)
@@ -283,6 +322,9 @@ class Evento:
     
     @staticmethod
     def getEstilosMusicais(idEvento: int):
+        """
+        Retorna os estilos musicais de um evento
+        """
         sql = f"SELECT em.nome FROM evento_tem_estilo_musical eem JOIN estilo_musical em ON em.id=eem.id_estilo_musical WHERE eem.id_evento={idEvento}"
 
         query_ans = DBConnection.query(sql, True)
@@ -292,6 +334,9 @@ class Evento:
     
     @staticmethod
     def get_eventos(idUsuario: int, conexoes: list[dict]):
+        """
+        Retorna todos os eventos com todas as conexões interessadas e participantes
+        """
         eventos = Evento.where({})
         if eventos == False:
             return False

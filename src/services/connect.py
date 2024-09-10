@@ -11,6 +11,9 @@ class DBConnection:
     # caso nao ocorra um erro e hasReturn == true, retorna o retorno da execucao daquele comando SQL
     @staticmethod
     def query(sql: str, hasReturn: bool):
+        """
+        Método estático que executa um comando SQL
+        """
         conn = psycopg2.connect(**load_config())
 
         # cursor para realizar operacoes no banco de dados, parece que eh necessario
@@ -40,6 +43,9 @@ class DBConnection:
         
     @staticmethod
     def delete_user(id: int):
+        """
+        Método estático que deleta em cascata um usuário do banco de dados
+        """
         conn = psycopg2.connect(**load_config())
 
         curs = conn.cursor()

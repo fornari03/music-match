@@ -8,6 +8,9 @@ class EstiloMusical:
         self.__isNew = True
 
     def change_values(self, data: dict):
+        """
+        Muda os valores do objeto para os valores passados no dicionario
+        """
         for key in data:
             if key == 'id':
                 self.id = data[key]
@@ -15,6 +18,9 @@ class EstiloMusical:
                 self.nome = data[key]
 
     def save(self):
+        """
+        Metodo para salvar o Estilo Musical no banco de dados
+        """
         if self.nome == None:
             self.nome = "NULL"
         elif self.nome[0] != "'" and self.nome[-1] != "'":
@@ -31,6 +37,9 @@ class EstiloMusical:
 
     @staticmethod
     def where(data: dict):
+        """
+        Metodo para buscar Estilos Musicais no banco de dados
+        """
         sql = "SELECT id, nome FROM estilo_musical"
         # se coloca parenteses entre os nomes da coluna o retorno eh uma string que quebra o codigo, n entendi direito o pq :)
 

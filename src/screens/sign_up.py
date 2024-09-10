@@ -14,14 +14,23 @@ class SignUpScreen(MDScreen):
         super().__init__(**kwargs)
 
     def show_date_picker(self):
+        """
+        Mostra o seletor de data para o usuário
+        """
         date_dialog = MDDatePicker()
         date_dialog.open()
         date_dialog.bind(on_save=self.on_save)
 
     def on_save(self, instance, value, date_range):
+        """
+        Salva a data selecionada pelo usuário
+        """
         self.ids.data_nascimento.text = value.strftime("%d/%m/%Y")
 
     def sign_up(self):
+        """
+        Realiza o cadastro do usuário
+        """
         nome = self.ids.nome.text.strip()
         email = self.ids.email.text.strip()
         data_nascimento = self.ids.data_nascimento.text.strip()
@@ -61,8 +70,6 @@ class SignUpScreen(MDScreen):
         
         user = Usuario()
         verify_email = user.where({'email': f"'{data['email']}'"})
-        
-        print("oi")
 
         if verify_email == False:
             show_popup("Erro no banco de dados", "Erro ao salvar os dados, tente novamente!")
@@ -71,8 +78,6 @@ class SignUpScreen(MDScreen):
         if len(verify_email) > 0:
             show_popup("Erro: Email já cadastrado", "O email informado já foi cadastrado anteriormente!")
             return
-        
-        print("oi")
         
         user.change_values(data)
         if user.save():
