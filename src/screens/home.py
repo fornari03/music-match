@@ -74,7 +74,7 @@ class HomeScreen(MDScreen):
         }
         
         # abre o spotify na musica clicada
-        item.on_release = lambda: webbrowser.open(music['spotify_link'])
+        item.on_release = lambda: webbrowser.open(music['link_spotify'])
         
         self.ids.music_list.add_widget(item)
 
