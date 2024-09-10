@@ -99,7 +99,7 @@ class Evento:
     # Relacionamento participou_de com o usuario
 
     @staticmethod
-    def findParticipouDe(self, email: str):
+    def findParticipouDe(idEvento: int, email: str):
         user = Usuario.where({"email": email})
 
         if user == False:
@@ -107,7 +107,7 @@ class Evento:
 
         idUser = user[0].id
 
-        sql = f"SELECT * FROM participou_de WHERE id_usuario={idUser} AND id_evento={self.id}"
+        sql = f"SELECT * FROM participou_de WHERE id_usuario={idUser} AND id_evento={idEvento}"
     
         query = DBConnection.query(sql, True)
 
@@ -116,7 +116,7 @@ class Evento:
         return query
     
     @staticmethod
-    def addParticipouDe(self, email: str):
+    def addParticipouDe(idEvento: int, email: str):
         user = Usuario.where({"email": email})
 
         if user == False:
@@ -124,7 +124,7 @@ class Evento:
 
         idUser = user[0].id
 
-        sql = f"INSERT INTO participou_de (id_usuario, id_evento) VALUES ({idUser}, {self.id})"
+        sql = f"INSERT INTO participou_de (id_usuario, id_evento) VALUES ({idUser}, {idEvento})"
 
         query = DBConnection.query(sql, False)
 
@@ -133,7 +133,7 @@ class Evento:
         return True
     
     @staticmethod
-    def editParticipouDe(self, email: str):
+    def editParticipouDe(idEvento: int, email: str):
         user = Usuario.where({"email": email})
 
         if user == False:
@@ -141,7 +141,7 @@ class Evento:
 
         idUser = user[0].id
 
-        sql = f"UPDATE participou_de SET id_usuario={idUser} WHERE id_usuario={idUser} AND id_evento={self.id}"
+        sql = f"UPDATE participou_de SET id_usuario={idUser} WHERE id_usuario={idUser} AND id_evento={idEvento}"
 
         query = DBConnection.query(sql, False)
 
@@ -150,7 +150,7 @@ class Evento:
         return True
     
     @staticmethod
-    def deleteParticipouDe(self, email: str):
+    def deleteParticipouDe(idEvento: int, email: str):
         user = Usuario.where({"email": email})
 
         if user == False:
@@ -158,7 +158,7 @@ class Evento:
 
         idUser = user[0].id
 
-        sql = f"DELETE FROM participou_de WHERE id_usuario={idUser} AND id_evento={self.id}"
+        sql = f"DELETE FROM participou_de WHERE id_usuario={idUser} AND id_evento={idEvento}"
 
         query = DBConnection.query(sql, False)
 
@@ -169,7 +169,7 @@ class Evento:
     # Relacionamento tem_interesse com o usuario
 
     @staticmethod
-    def findTemInteresse(self, email: str):
+    def findTemInteresse(idEvento: int, email: str):
         user = Usuario.where({"email": email})
 
         if user == False:
@@ -177,7 +177,7 @@ class Evento:
 
         idUser = user[0].id
 
-        sql = f"SELECT * FROM tem_interesse WHERE id_usuario={idUser} AND id_evento={self.id}"
+        sql = f"SELECT * FROM tem_interesse WHERE id_usuario={idUser} AND id_evento={idEvento}"
     
         query = DBConnection.query(sql, True)
 
@@ -186,7 +186,7 @@ class Evento:
         return query
     
     @staticmethod
-    def addTemInteresse(self, email: str):
+    def addTemInteresse(idEvento: int, email: str):
         user = Usuario.where({"email": email})
 
         if user == False:
@@ -194,7 +194,7 @@ class Evento:
 
         idUser = user[0].id
 
-        sql = f"INSERT INTO tem_interesse (id_usuario, id_evento) VALUES ({idUser}, {self.id})"
+        sql = f"INSERT INTO tem_interesse (id_usuario, id_evento) VALUES ({idUser}, {idEvento})"
 
         query = DBConnection.query(sql, False)
 
@@ -203,7 +203,7 @@ class Evento:
         return True
     
     @staticmethod
-    def editTemInteresse(self, email: str):
+    def editTemInteresse(idEvento: int, email: str):
         user = Usuario.where({"email": email})
 
         if user == False:
@@ -211,7 +211,7 @@ class Evento:
 
         idUser = user[0].id
 
-        sql = f"UPDATE tem_interesse SET id_usuario={idUser} WHERE id_usuario={idUser} AND id_evento={self.id}"
+        sql = f"UPDATE tem_interesse SET id_usuario={idUser} WHERE id_usuario={idUser} AND id_evento={idEvento}"
 
         query = DBConnection.query(sql, False)
 
@@ -220,7 +220,7 @@ class Evento:
         return True
     
     @staticmethod
-    def deleteTemInteresse(self, email: str):
+    def deleteTemInteresse(idEvento: int, email: str):
         user = Usuario.where({"email": email})
 
         if user == False:
@@ -228,7 +228,7 @@ class Evento:
 
         idUser = user[0].id
 
-        sql = f"DELETE FROM tem_interesse WHERE id_usuario={idUser} AND id_evento={self.id}"
+        sql = f"DELETE FROM tem_interesse WHERE id_usuario={idUser} AND id_evento={idEvento}"
 
         query = DBConnection.query(sql, False)
 
@@ -237,8 +237,8 @@ class Evento:
         return True
     
     @staticmethod
-    def getArtists(idEvent: int):
-        sql = f"SELECT a.nome FROM artista a JOIN participa p ON a.id=p.id_artista WHERE p.id_evento={idEvent}"
+    def getArtists(idEvento: int):
+        sql = f"SELECT a.nome FROM artista a JOIN participa p ON a.id=p.id_artista WHERE p.id_evento={idEvento}"
 
         query_ans = DBConnection.query(sql, True)
         if query_ans == -1:
