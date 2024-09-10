@@ -74,7 +74,7 @@ class Evento:
     # Lembra de colocar as aspas simples em volta dos valores que sao text la no BD
     @staticmethod
     def where(data: dict):
-        sql = "SELECT id, nome, descricao, localizacao, data_realizacao, imagem FROM evento"
+        sql = "SELECT id, nome, descricao, localizacao, data_realizacao, imagem FROM evento ORDER BY data_realizacao ASC"
         # se coloca parenteses entre os nomes da coluna o retorno eh uma string que quebra o codigo, n entendi direito o pq :)
 
         if len(data.keys()) != 0:
