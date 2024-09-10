@@ -1,5 +1,6 @@
 from ..services.connect import DBConnection
 from ..models.usuario import Usuario
+from datetime import date
 
 class Evento:
 
@@ -10,6 +11,7 @@ class Evento:
         self.descricao = None
         self.localizacao = None
         self.data_realizacao = None
+        self.imagem = None
         self.__setIsNew(True)
 
     # Troca os valores dos atributos
@@ -25,6 +27,8 @@ class Evento:
                 self.localizacao = data[key]
             elif key == "data_realizacao":
                 self.data_realizacao = data[key]
+            elif key == "imagem":
+                self.imagem = data[key]
 
     # metodo privado pra dizer se uma instancia desse objeto foi criada pelo programa (True) ou se foi importada do BD (False)
     def __setIsNew(self, val: bool):
@@ -48,12 +52,16 @@ class Evento:
             self.data_realizacao = "NULL"
         elif self.data_realizacao[0] != "'" and self.data_realizacao[-1] != "'":
             self.data_realizacao = f"'{self.data_realizacao}'"
+        if self.imagem == None:
+            self.imagem = "NULL"
+        elif self.imagem[0] != "'" and self.imagem[-1] != "'":
+            self.imagem = f"'{self.imagem}'"
         
 
         if self.__isnew:
-            sql = f"INSERT INTO evento (nome, descricao, localizacao, data_realizacao) VALUES ({self.nome}, {self.descricao}, {self.localizacao}, {self.data_realizacao})"
+            sql = f"INSERT INTO evento (nome, descricao, localizacao, data_realizacao, imagem) VALUES ({self.nome}, {self.descricao}, {self.localizacao}, {self.data_realizacao}, {self.imagem})"
         else:
-            sql = f"UPDATE usuario SET nome={self.nome}, descricao={self.descricao}, localizacao={self.senha}, localizacao={self.localizacao}, data_realizacao={self.data_realizacao} WHERE id={self.id}"
+            sql = f"UPDATE usuario SET nome={self.nome}, descricao={self.descricao}, localizacao={self.senha}, localizacao={self.localizacao}, data_realizacao={self.data_realizacao}, imagem={self.imagem} WHERE id={self.id}"
 
         if DBConnection.query(sql, False) == -1:
             return False
@@ -66,7 +74,7 @@ class Evento:
     # Lembra de colocar as aspas simples em volta dos valores que sao text la no BD
     @staticmethod
     def where(data: dict):
-        sql = "SELECT id, nome, descricao, localizacao, data_realizacao FROM evento"
+        sql = "SELECT id, nome, descricao, localizacao, data_realizacao, imagem FROM evento"
         # se coloca parenteses entre os nomes da coluna o retorno eh uma string que quebra o codigo, n entendi direito o pq :)
 
         if len(data.keys()) != 0:
@@ -88,7 +96,7 @@ class Evento:
         for inst in lines:
             new_obj = Evento()
             new_obj.__setIsNew(False)
-            read_data = {"id": inst[0], "nome": inst[1], "localizacao": inst[2], "data_realizacao": inst[3]}
+            read_data = {"id": inst[0], "nome": inst[1], "descricao":inst[2], "localizacao": inst[3], "data_realizacao": inst[4], "imagem": inst[5]}
             new_obj.change_values(read_data)
 
             obj.append(new_obj)
@@ -269,6 +277,7 @@ class Evento:
             return False
         return query_ans
     
+    @staticmethod
     def getEstilosMusicais(idEvento: int):
         sql = f"SELECT em.nome FROM evento_tem_estilo_musical eem JOIN estilo_musical em ON em.id=eem.id_estilo_musical WHERE eem.id_evento={idEvento}"
 
