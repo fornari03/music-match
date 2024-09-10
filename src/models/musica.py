@@ -104,7 +104,7 @@ class Musica:
         for inst in lines_feedback:
             new_obj = Musica()
             new_obj.__isNew = False
-            with open (f"imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
+            with open (f"images/imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
                 arquivo.write(inst[2])
             read_data = {"id": inst[0], "nome": inst[1], "capa": f'imagem_musica_{inst[0]}.jpg', "link_spotify": inst[3]}
 
@@ -115,7 +115,7 @@ class Musica:
         for inst in lines_no_feedback:
             new_obj = Musica()
             new_obj.__isNew = False
-            with open (f"imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
+            with open (f"images/imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
                 arquivo.write(inst[2])
             read_data = {"id": inst[0], "nome": inst[1], "capa": f"imagem_musica_{inst[0]}.jpg", "link_spotify": inst[3]}
 
@@ -192,10 +192,11 @@ class Musica:
         return avaliadas, nao_avaliadas
     
 '''
+#codigo pra botar imagem
 from ..services.config import load_config
 import psycopg2
 
-with open ("src/screens/imagem.jpg", 'rb') as arquivo:
+with open ("src/screens/Fragil-cover.jpg", 'rb') as arquivo:
     x = arquivo.read()
 
 conn = psycopg2.connect(**load_config())
@@ -204,7 +205,7 @@ conn = psycopg2.connect(**load_config())
 curs = conn.cursor()
 
 # executa o comando fornecido
-curs.execute("UPDATE musica SET capa=(%s) WHERE id=3;", (x,))
+curs.execute("UPDATE musica SET capa=(%s) WHERE id=1;", (x,))
 
 conn.commit()
 curs.close()

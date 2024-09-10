@@ -107,22 +107,24 @@ class Usuario:
 
     # apaga as instancias no BD com aqueles dados
     @staticmethod
-    def delete(data: dict):
-        sql = "DELETE FROM Usuario"
-        
-        if len(data.keys()) != 0:
-            key0 = next(iter(data))
-            sql += f" WHERE {key0}={data[key0]}"
-
-            for key in data:
-                if key == key0:
-                    continue
-
-                sql += f" AND {key}={data[key]}"
-
-        query = DBConnection.query(sql, False)
-
-        if query == -1:
+    def delete(idUser: int):
+        sql = f"DELETE FROM redes_sociais WHERE id_usuario={idUser}"
+        if DBConnection.query(sql, False):
+            return False
+        sql = f"DELETE FROM conecta_com WHERE id_usuario_1={idUser} OR id_usuario_2={idUser}"
+        if DBConnection.query(sql, False):
+            return False
+        sql = f"DELETE FROM usuario_avalia_musica WHERE id_usuario={idUser}"
+        if DBConnection.query(sql, False):
+            return False
+        sql = f"DELETE FROM tem_interesse WHERE id_usuario={idUser}"
+        if DBConnection.query(sql, False):
+            return False
+        sql = f"DELETE FROM participou_de WHERE id_usuario={idUser}"
+        if DBConnection.query(sql, False):
+            return False
+        sql = f"DELETE FROM usuario WHERE id={idUser}"
+        if DBConnection.query(sql, False):
             return False
         return True
     
