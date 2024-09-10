@@ -197,16 +197,15 @@ class HomeScreen(MDScreen):
 
         grid_layout = MDGridLayout(cols=2, padding=[5, 10, 5, 10], spacing=10)
 
-        grid_layout.add_widget(FitImage(source="screens/imagem.jpg", size_hint_y=None, height="260dp", radius=[15]))
+        grid_layout.add_widget(FitImage(source=f"images/imagem_evento_{event['id']}.jpg", size_hint_y=None, height="260dp", radius=[15]))
 
         box_layout = MDBoxLayout(orientation="vertical", spacing=5)
 
-        box_layout.add_widget(MDLabel(text=event['name'], size_hint=(1, 0.4), bold=True))
+        box_layout.add_widget(MDLabel(text=event['nome'], size_hint=(1, 0.4), bold=True))
 
         box_layout.add_widget(MDLabel(text=event['descricao'], size_hint=(1, 0.7)))
 
-        data_evento = datetime.strptime(event['data'], "%Y-%m-%d %H:%M:%S")
-        box_layout.add_widget(MDLabel(text=f"Data: {data_evento.strftime('%d/%m/%Y - %H:%M')}", size_hint=(1, 0.6)))
+        box_layout.add_widget(MDLabel(text=f"Data: {event['data_realizacao'].strftime('%d/%m/%Y - %H:%M')}", size_hint=(1, 0.6)))
 
         box_layout.add_widget(MDLabel(text=f"Local: {event['localizacao']}", size_hint=(1, 0.6)))
 
@@ -214,7 +213,7 @@ class HomeScreen(MDScreen):
 
         box_layout.add_widget(MDLabel(text=f"Estilos: {', '.join(event['estilos'])}", size_hint=(1, 0.6)))
 
-        if data_evento >= datetime.now():
+        if event['data_realizacao'] >= datetime.now():
             if len(event['conexoes_interessadas']) == 0:
                 texto = "Nenhuma conexão se interessou neste evento."
             elif len(event['conexoes_interessadas']) == 1:
@@ -361,15 +360,13 @@ class HomeScreen(MDScreen):
         self.ids.events_grid.clear_widgets()
         if self.showing_future_events:
             for event in self.events:
-                data_evento = datetime.strptime(event['data'], "%Y-%m-%d %H:%M:%S")
-                if data_evento >= datetime.now():
-                    if search_string is None or search_string.lower().strip() in event['name'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in data_evento.strftime('%d/%m/%Y - %H:%M'):
+                if event['data_realizacao'] >= datetime.now():
+                    if search_string is None or search_string.lower().strip() in event['nome'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in event['data_realizacao'].strftime('%d/%m/%Y - %H:%M'):
                         self.add_event_banner(event)
         else:
             for event in self.events:
-                data_evento = datetime.strptime(event['data'], "%Y-%m-%d %H:%M:%S")
-                if data_evento < datetime.now():
-                    if search_string is None or search_string.lower().strip() in event['name'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in data_evento.strftime('%d/%m/%Y - %H:%M'):
+                if event['data_realizacao'] < datetime.now():
+                    if search_string is None or search_string.lower().strip() in event['nome'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in event['data_realizacao'].strftime('%d/%m/%Y - %H:%M'):
                         self.add_event_banner(event)
 
     def switch_events_view(self):
@@ -403,13 +400,13 @@ class HomeScreen(MDScreen):
     ############################## Tela de Conexões ##############################
 
     def add_connection_banner(self, connection, status):
-        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300, on_release=lambda x: self.open_profile(connection))
+        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300)
 
         box_layout = MDBoxLayout(orientation="vertical", padding=[10], spacing=10)
 
         box_layout.add_widget(MDLabel(text=connection['nome'], size_hint=(0.9, 0.1), bold=True))
 
-        box_layout.add_widget(MDLabel(text="    //    ".join(connection['redes_sociais']), size_hint=(0.9, 0.2)))
+        box_layout.add_widget(MDLabel(text="    //    ".join([": ".join([rd, ru]) for rd, ru in connection['redes_sociais']]), size_hint=(0.9, 0.2)))
 
         box_layout.add_widget(MDLabel(text=f"Gosto musical: {', '.join([genero for genero in connection['musical_taste']])}", size_hint=(0.9, 0.1)))
 

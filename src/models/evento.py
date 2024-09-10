@@ -1,6 +1,6 @@
 from ..services.connect import DBConnection
 from ..models.usuario import Usuario
-from datetime import date
+from datetime import datetime
 
 class Evento:
 
@@ -74,7 +74,7 @@ class Evento:
     # Lembra de colocar as aspas simples em volta dos valores que sao text la no BD
     @staticmethod
     def where(data: dict):
-        sql = "SELECT id, nome, descricao, localizacao, data_realizacao, imagem FROM evento ORDER BY data_realizacao ASC"
+        sql = "SELECT id, nome, descricao, localizacao, data_realizacao, imagem FROM evento "
         # se coloca parenteses entre os nomes da coluna o retorno eh uma string que quebra o codigo, n entendi direito o pq :)
 
         if len(data.keys()) != 0:
@@ -87,6 +87,8 @@ class Evento:
                 
                 sql += f" AND {key}={data[key]}"
         
+        sql += "ORDER BY data_realizacao ASC"
+
         lines = DBConnection.query(sql, True)
 
         if lines == -1:
@@ -294,11 +296,13 @@ class Evento:
         if eventos == False:
             return False
         
+        eventos_dict = []
         for evento in eventos:
             evento = evento.__dict__
             evento["estilos"] = [estilo[0] for estilo in Evento.getEstilosMusicais(evento["id"])]
             evento["artistas"] = [artista[0] for artista in Evento.getArtists(evento["id"])]
-            if evento["data_realizacao"] >= date.now():
+            if evento["data_realizacao"] >= datetime.now():
+                evento["conexoes_interessadas"] = []
                 for conexao in conexoes:
                     interesse = Evento.findTemInteresse(conexao["id"], evento["id"])
                     if interesse == False:
@@ -314,6 +318,7 @@ class Evento:
                     evento["status"] = "N"
                 
             else:
+                evento["conexoes_foram"] = []
                 for conexao in conexoes:
                     participacao = Evento.findParticipouDe(conexao["id"], evento["id"])
                     if participacao == False:
@@ -327,5 +332,7 @@ class Evento:
                     evento["status"] = "P"
                 else:
                     evento["status"] = "N"
+            
+            eventos_dict.append(evento)
         
-        return eventos
+        return eventos_dict
