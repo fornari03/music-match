@@ -46,9 +46,9 @@ class SignUpScreen(MDScreen):
             show_popup("Data de nascimento inválida", "Insira uma Data de nascimento válida!")
             return
 
-        # Verificar senha (mínimo 6 caracteres e máximo de 10)
-        if len(senha) < 6 or len(senha) > 10:
-            show_popup("Senha inválida", "A senha deve ter entre 6 e 10 caracteres!")
+        # Verificar senha (mínimo 5 caracteres)
+        if len(senha) >= 5:
+            show_popup("Senha inválida", "A senha deve ter pelo menos 5 caracteres!")
             return
 
         data = {
@@ -59,9 +59,9 @@ class SignUpScreen(MDScreen):
                 }
         
         user = Usuario()
-        verify_email = user.where({'email':data['email']})
+        verify_email = user.where({'email': f"'{data['email']}'"})
         
-        if verify_email == -1:
+        if not verify_email:
             show_popup("Erro no banco de dados", "Erro ao salvar os dados, tente novamente!")
             return
 
