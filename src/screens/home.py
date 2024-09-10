@@ -37,6 +37,15 @@ class HomeScreen(MDScreen):
         self.evaluated, self.not_evaluated = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
         self.connected = Usuario.get_connections(login.usuario_logado.id)
         self.not_connected = Usuario.get_not_connections(login.usuario_logado.id)
+
+        # informacoes do perfil
+        self.ids.nome.text = login.usuario_logado.nome
+        self.ids.email.text = login.usuario_logado.email
+        self.ids.data_nascimento.text = login.usuario_logado.data_nascimento.strftime("%d/%m/%Y")
+        self.data_nascimento = login.usuario_logado.data_nascimento
+        self.ids.senha.text = ""
+        # TODO pegar as redes sociais da pessoa
+
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
         self.events = Evento.get_eventos(login.usuario_logado.id, self.connected)
 
@@ -568,16 +577,67 @@ class HomeScreen(MDScreen):
 
     def on_save(self, instance, value, date_range):
         self.ids.data_nascimento.text = value.strftime("%d/%m/%Y")
+        try:
+            self.data_nascimento = value
+        except:
+            self.data_nascimento = None
 
     def save(self):
-        # TODO: verificar se campos estão preenchidos e são válidos
+        if self.ids.nome.text.strip() == "" or self.ids.email.text.strip() == "" or self.ids.data_nascimento.text.strip() == "":
+            self.dialog = MDDialog(text="Preencha o nome, email e data de nascimento atualizada.").open()
+            return
+        
+        if self.ids.senha.text.strip() != "":
+            self.dialog = MDDialog(
+                text="Deseja mudar sua senha?",
+                buttons=[
+                    MDFlatButton(
+                        text="Não",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    ),
+                    MDFlatButton(
+                        text="Sim",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.confirm_save())]
+            )
+            self.dialog.open()
+        else:
+            self.confirm_save()
+
+    def confirm_save(self):
+        self.dialog.dismiss()
+        
         nome = self.ids.nome.text.strip()
         email = self.ids.email.text.strip()
-        data_nascimento = self.ids.data_nascimento.text.strip()
+        data_nascimento = self.data_nascimento
         senha = self.ids.senha.text.strip()
         lista_redes_sociais = [(child.children[0].hint_text.strip(), child.children[0].text.strip()) for child in self.ids.lista_opcoes.children if child.children[1].active and child.children[0].text.strip() != ""] # lista de tuplas (nome_rede_social, usuario) habilitados e preenchidos
-        # TODO: implementar lógica de edição dos dados com o API do backend
-        pass
+
+        changes = {}
+        if nome != login.usuario_logado.nome:
+            changes["nome"] = nome
+        
+        if email != login.usuario_logado.email:
+            changes["email"] = email
+
+        if data_nascimento != login.usuario_logado.data_nascimento:
+            changes["data_nascimento"] = data_nascimento
+
+        if senha != "":
+            changes["nova_senha"] = senha
+
+        #TODO pegar as redes sociais
+        
+        login.usuario_logado.change_values(changes)
+        if not login.usuario_logado.save():
+            self.dialog = MDDialog(text="Erro ao salvar os dados no banco de dados.").open()
+            return
+
+        # nao precisa reescrever os campos pq eh literalmente o que ja ta escrito la
+        self.dialog = MDDialog(text="Dados atualizados com sucesso!").open()
 
     def delete_account(self):
         self.dialog = MDDialog(
@@ -599,6 +659,11 @@ class HomeScreen(MDScreen):
 
     def confirm_delete(self):
         self.dialog.dismiss()
+
+        if not Usuario.delete(login.usuario_logado.id):
+            self.dialog = MDDialog(text="Ocorreu um erro ao deletar o usuario.").open()
+            return
+
         self.dialog = MDDialog(
             text="Conta excluída com sucesso!",
             buttons=[

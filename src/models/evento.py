@@ -203,7 +203,7 @@ class Evento:
 
         if event == False:
             return False
-
+          
         sql = f"SELECT * FROM tem_interesse WHERE id_usuario={idUser} AND id_evento={idEvent}"
     
         query = DBConnection.query(sql, True)
@@ -273,8 +273,8 @@ class Evento:
         return True
     
     @staticmethod
-    def getArtists(idEvent: int):
-        sql = f"SELECT a.nome FROM artista a JOIN participa p ON a.id=p.id_artista WHERE p.id_evento={idEvent}"
+    def getArtists(idEvento: int):
+        sql = f"SELECT a.nome FROM artista a JOIN participa p ON a.id=p.id_artista WHERE p.id_evento={idEvento}"
 
         query_ans = DBConnection.query(sql, True)
         if query_ans == -1:
