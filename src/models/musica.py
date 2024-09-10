@@ -23,10 +23,14 @@ class Musica:
     def save(self):
         if self.nome == None:
             self.nome = "NULL"
+        elif self.nome[0] != "'" and self.nome[-1] != "'":
+            self.nome = f"'{self.nome}'"
         if self.capa == None:
             self.capa = "NULL"
         if self.link_spotify == None:
             self.link_spotify = "NULL"
+        elif self.link_spotify[0] != "'" and self.link_spotify[-1] != "'":
+            self.link_spotify = f"'{self.link_spotify}'"
 
         if self.__isNew:
             sql = f"INSERT INTO musica (nome, capa, link_spotify) VALUES ({self.nome}, {self.capa}, {self.link_spotify})"
@@ -132,3 +136,13 @@ class Musica:
         if DBConnection.query(sql, False) == -1:
             return False
         return True
+    
+    # pega os estilos musicais de uma musica
+    @staticmethod
+    def getEstilosMusicais(idMusic: int):
+        sql = f"SELECT em.nome FROM pertence_ao pa JOIN estilo_musical em ON em.id=pa.id_estilo_musical WHERE pa.id_musica={idMusic}"
+
+        query_ans = DBConnection.query(sql, True)
+        if query_ans == -1:
+            return False
+        return query_ans

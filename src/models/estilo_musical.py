@@ -1,47 +1,38 @@
 from ..services.connect import DBConnection
 
-class Artista:
-
+class EstiloMusical:
+    
     def __init__(self):
         self.id = None
         self.nome = None
-        self.foto = None
         self.__isNew = True
 
     def change_values(self, data: dict):
-        for key in data.keys():
+        for key in data:
             if key == 'id':
                 self.id = data[key]
             elif key == 'nome':
                 self.nome = data[key]
-            elif key == 'foto':
-                self.foto = data[key]
 
-    # se eh uma nova instancia da problema do self.id nao ficar atualizado
-    # esses consertos podem dar muito problema se fizer SAVE 2 vezes seguidas
     def save(self):
-        if self.id == None:
-            self.id = "NULL"
         if self.nome == None:
             self.nome = "NULL"
         elif self.nome[0] != "'" and self.nome[-1] != "'":
             self.nome = f"'{self.nome}'"
-        if self.foto == None:
-            self.foto = "NULL"
 
-        sql = ""
         if self.__isNew:
-            sql = f"INSERT INTO artista (nome, foto) VALUES ({self.nome}, {self.foto})"
+            sql = f"INSERT INTO estilo_musical (nome) VALUES ({self.nome})"
         else:
-            sql = f"UPDATE artista SET nome={self.nome}, foto={self.foto} WHERE id={self.id}"
+            sql = f"UPDATE estilo_musical SET nome={self.nome} WHERE id={self.id}"
 
         if DBConnection.query(sql, False) == -1:
-            return False
+            return False        
         return True
 
     @staticmethod
     def where(data: dict):
-        sql = "SELECT id, nome, foto FROM artista"
+        sql = "SELECT id, nome FROM estilo_musical"
+        # se coloca parenteses entre os nomes da coluna o retorno eh uma string que quebra o codigo, n entendi direito o pq :)
 
         if len(data.keys()) != 0:
             key0 = next(iter(data))
@@ -60,9 +51,9 @@ class Artista:
 
         obj = []
         for inst in lines:
-            new_obj = Artista()
+            new_obj = EstiloMusical()
             new_obj.__isNew = False
-            read_data = {"id": inst[0], "nome": inst[1], "foto": inst[2]}
+            read_data = {"id": inst[0], "nome": inst[1]}
             new_obj.change_values(read_data)
 
             obj.append(new_obj)

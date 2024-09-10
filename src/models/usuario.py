@@ -24,10 +24,7 @@ class Usuario:
             elif key == "email":
                 self.email = data[key]
             elif key == "senha":
-                if self.__isnew:
-                    self.senha = encrypt_password(data[key])
-                else:
-                    self.senha = data[key]
+                self.senha = encrypt_password(data[key])
             elif key == "data_nascimento":
                 self.data_nascimento = data[key]
             elif key == "foto_perfil":
@@ -41,12 +38,20 @@ class Usuario:
     def save(self):
         if self.nome == None:
             self.nome = "NULL"
+        elif self.nome[0] != "'" and self.nome[-1] != "'":
+            self.nome = f"'{self.nome}'"
         if self.email == None:
             return False
+        elif self.email[0] != "'" and self.email[-1] != "'":
+            self.email = f"'{self.email}'"
         if self.senha == None:
             self.senha = "NULL"
+        elif self.senha[0] != "'" and self.senha[-1] != "'":
+            self.senha = f"'{self.senha}'"
         if self.data_nascimento == None:
             self.data_nascimento = "NULL"
+        elif self.data_nascimento[0] != "'" and self.data_nascimento[-1] != "'":
+            self.data_nascimento = f"'{self.data_nascimento}'"
         if self.foto_perfil == None:
             self.foto_perfil = "NULL"
 
