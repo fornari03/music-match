@@ -290,9 +290,6 @@ MDScreenManager:
         MDTextField:
             id: nome
             hint_text: "Nome"
-            max_text_length: 10
-            helper_text_mode: "on_error"
-            helper_text: "Máximo de 10 caracteres"
             icon_right: "account"
             mode: "rectangle"
             size_hint_x: None
@@ -303,10 +300,9 @@ MDScreenManager:
             on_text_validate:
                 root.inputtextfn()
                 root.text_validate()
+
         MDTextField:
             id: email
-            helper_text: "Insira seu email"
-            helper_text_mode: "on_error"
             hint_text: "Email"
             icon_right: "email"
             mode: "rectangle"
@@ -315,6 +311,7 @@ MDScreenManager:
             pos_hint: {'center_x':.5, 'center_y':.5}
             on_text:
                 self.text = self.text.replace(" ", "")
+                
         MDTextField:
             id: data_nascimento
             hint_text: "Data de Nascimento"
@@ -361,6 +358,5 @@ MDScreenManager:
             size_hint_x: None
             width: 300
             pos_hint: {"center_x": 0.5}
-            on_release: 
-                root.sign_up()    
+            on_release: root.sign_up()   
 '''
