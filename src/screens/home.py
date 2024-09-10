@@ -608,8 +608,9 @@ class HomeScreen(MDScreen):
             )
             self.dialog.open()
         else:
-            self.dialog = MDDialog(text="Gambiarra")
+            self.dialog = MDDialog(text="Ocorreu um erro inesperado.")
             self.confirm_save()
+            self.confirm_save_perfil()
 
     def confirm_save_perfil(self):
         self.dialog.dismiss()

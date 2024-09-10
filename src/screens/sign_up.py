@@ -7,6 +7,7 @@ from kivy.uix.filechooser import FileChooserIconView
 from src.models.usuario import Usuario
 from src.utils.popup import show_popup
 from re import match
+from datetime import datetime
 
 class SignUpScreen(MDScreen):
     def __init__(self, **kwargs):
@@ -46,22 +47,24 @@ class SignUpScreen(MDScreen):
             show_popup("Data de nascimento inválida", "Insira uma Data de nascimento válida!")
             return
 
-        # Verificar senha (mínimo 6 caracteres e máximo de 10)
-        if len(senha) < 6 or len(senha) > 10:
-            show_popup("Senha inválida", "A senha deve ter entre 6 e 10 caracteres!")
+        # Verificar senha (mínimo 5 caracteres)
+        if len(senha) < 5:
+            show_popup("Senha inválida", "A senha deve ter pelo menos 5 caracteres!")
             return
 
         data = {
                 'nome': nome,
                 'email': email,
-                'data_nascimento': data_nascimento,
+                'data_nascimento': datetime.strptime(data_nascimento, "%d/%m/%Y"),
                 'senha': senha
                 }
         
         user = Usuario()
-        verify_email = user.where({'email':data['email']})
+        verify_email = user.where({'email': f"'{data['email']}'"})
         
-        if verify_email == -1:
+        print("oi")
+
+        if verify_email == False:
             show_popup("Erro no banco de dados", "Erro ao salvar os dados, tente novamente!")
             return
 
@@ -69,8 +72,10 @@ class SignUpScreen(MDScreen):
             show_popup("Erro: Email já cadastrado", "O email informado já foi cadastrado anteriormente!")
             return
         
+        print("oi")
+        
         user.change_values(data)
-        if user.save() != -1:
+        if user.save():
             show_popup("Sucesso", "Cadastro realizado com sucesso!")
             self.manager.current = "login_screen"
         else:
