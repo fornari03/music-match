@@ -281,7 +281,9 @@ class Usuario:
         
         otherDicts = []
         for otherUser in otherUsers:
+            sintonia = otherUser[2]
             otherUser = Usuario.others_to_dict(otherUser[0])
+            otherUser["sintonia"] = sintonia
             sql = f"""SELECT ar.nome FROM usuario_avalia_musica av
                         JOIN artista_tem_musica atm ON av.id_musica = atm.id_musica
                         JOIN artista ar ON atm.id_artista = ar.id
@@ -325,7 +327,9 @@ class Usuario:
         
         otherDicts = []
         for otherUser in otherUsers:
+            sintonia = otherUser[2]
             otherUser = Usuario.others_to_dict(otherUser[0])
+            otherUser["sintonia"] = sintonia
             sql = f"""SELECT ar.nome FROM usuario_avalia_musica av
                         JOIN artista_tem_musica atm ON av.id_musica = atm.id_musica
                         JOIN artista ar ON atm.id_artista = ar.id

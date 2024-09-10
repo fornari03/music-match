@@ -54,21 +54,12 @@ class HomeScreen(MDScreen):
 
         self.show_music_list()
 
-        self.connected = [
-            {"id": 2, "name": "João Silva", "social_media": ["Instagram: @joaosilva", "Twitter: @jsilva12", "Facebook: /joaosilvaa"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 87, "artists": ["artista 1", "artista 2", "artista 3"]},
-            {"id": 3, "name": "Maria Souza", "social_media": ["Twitter: @mariasouza"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 75, "artists": ["artista 1", "artista 2", "artista 3"]},
-            {"id": 4, "name": "Pedro Oliveira", "social_media": ["Facebook: /pedro.oliveira"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 65, "artists": ["artista 1", "artista 2", "artista 3"]},
-        ]
-
-        self.not_connected = [
-            {"id": 5, "name": "Henrique Vale", "social_media": ["Facebook: /h.valee"], "musical_taste": [["Pop", 43], ["Rock", 33], ["Jazz", 11]], "music_match": 12, "artists": ["artista 1", "artista 2", "artista 3"]},
-        ]
         self.show_connections_grid()
 
         self.events = [
             {"id": 1, "name": "HH Ceubinho", "descricao": "HH do Ceubinho é o melhor que tem uau que festa legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-09-12 19:00:00", "conexoes_interessadas": [self.connected[0]], "image": "screens/imagem.jpg", "status": "I", "artistas": ["artista1"], "generos": ["Funk", "Pop"]},
             {"id": 2, "name": "Show Bruno Mars", "descricao": "O Bruninho vem para Brasília ebaaaaaaaaaaa.", "localizacao": "Estádio Mané Garrinhcha", "data": "2024-10-26 18:00:00", "conexoes_interessadas": self.connected, "image": "screens/imagem.jpg", "status": "N", "artistas": ["Bruno Mars"], "generos": ["Pop"]},
-            {"id": 3, "name": "Festa do Calouro", "descricao": "Festa do Calouro da UnB, vai ser muito legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-08-12 19:00:00", "conexoes_foram": [self.connected[2]], "image": "screens/imagem.jpg", "status": "P", "artistas": ["artista1", "artista2"], "generos": ["Funk", "Pop"]},
+            {"id": 3, "name": "Festa do Calouro", "descricao": "Festa do Calouro da UnB, vai ser muito legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-08-12 19:00:00", "conexoes_foram": [self.connected[0]], "image": "screens/imagem.jpg", "status": "P", "artistas": ["artista1", "artista2"], "generos": ["Funk", "Pop"]},
         ]
 
         self.show_events_grid()
@@ -219,9 +210,9 @@ class HomeScreen(MDScreen):
             if len(event['conexoes_interessadas']) == 0:
                 texto = "Nenhuma conexão se interessou neste evento."
             elif len(event['conexoes_interessadas']) == 1:
-                texto = f"{event['conexoes_interessadas'][0]['name']} se interessou neste evento."
+                texto = f"{event['conexoes_interessadas'][0]['nome']} se interessou neste evento."
             else:
-                texto = f"{event['conexoes_interessadas'][0]['name']} e mais {len(event['conexoes_interessadas'])-1} conexões se interessaram neste evento."
+                texto = f"{event['conexoes_interessadas'][0]['nome']} e mais {len(event['conexoes_interessadas'])-1} conexões se interessaram neste evento."
             box_layout.add_widget(MDLabel(text=texto, size_hint=(1, 0.6), italic=True))
             if event['status'] == "I":
                 interest_button = MDRoundFlatIconButton(id="interest_button", text="Sem interesse", size_hint=(0.25, None), icon="alarm-note")
@@ -232,9 +223,9 @@ class HomeScreen(MDScreen):
             if len(event['conexoes_foram']) == 0:
                 texto = "Nenhuma conexão foi para este evento."
             elif len(event['conexoes_foram']) == 1:
-                texto = f"{event['conexoes_foram'][0]['name']} foi para este evento."
+                texto = f"{event['conexoes_foram'][0]['nome']} foi para este evento."
             else:
-                texto = f"{event['conexoes_foram'][0]['name']} e mais {len(event['conexoes_foram'])-1} conexões foram para este evento."
+                texto = f"{event['conexoes_foram'][0]['nome']} e mais {len(event['conexoes_foram'])-1} conexões foram para este evento."
             box_layout.add_widget(MDLabel(text=texto, size_hint=(1, 0.6), italic=True))
             if event['status'] == "P":
                 interest_button = MDRoundFlatIconButton(id="interest_button", text="Marcar ausência", size_hint=(0.25, None), icon="account-check")
@@ -360,15 +351,15 @@ class HomeScreen(MDScreen):
 
         box_layout = MDBoxLayout(orientation="vertical", padding=[10], spacing=10)
 
-        box_layout.add_widget(MDLabel(text=connection['name'], size_hint=(0.9, 0.1), bold=True))
+        box_layout.add_widget(MDLabel(text=connection['nome'], size_hint=(0.9, 0.1), bold=True))
 
-        box_layout.add_widget(MDLabel(text="    //    ".join(connection['social_media']), size_hint=(0.9, 0.2)))
+        box_layout.add_widget(MDLabel(text="    //    ".join(connection['redes_sociais']), size_hint=(0.9, 0.2)))
 
-        box_layout.add_widget(MDLabel(text=f"Gosto musical: {', '.join([': '.join([genero, str(perc)+'%']) for [genero, perc] in connection['musical_taste']])}", size_hint=(0.9, 0.1)))
+        box_layout.add_widget(MDLabel(text=f"Gosto musical: {', '.join([genero for genero in connection['musical_taste']])}", size_hint=(0.9, 0.1)))
 
         box_layout.add_widget(MDLabel(text=f"Artistas: {', '.join(connection['artists'])}", size_hint=(0.9, 0.2)))
 
-        box_layout.add_widget(MDLabel(text=f"Music Match: {connection['music_match']}%", size_hint=(0.3, 0.1)))
+        box_layout.add_widget(MDLabel(text=f"Music Match: {connection['sintonia']}%", size_hint=(0.3, 0.1)))
 
         if status == "connected":
             disconnectButton = MDRoundFlatIconButton(text="Desconectar", size_hint=(0.25, None), icon="account-minus", icon_color="red", text_color="red", line_color="red")
@@ -453,11 +444,11 @@ class HomeScreen(MDScreen):
         self.ids.connections_grid.clear_widgets()
         if self.showing_users_connected:
             for connection in self.connected:
-                if search_string is None or search_string.lower().strip() in connection['name'].lower().strip() or search_string.lower().strip() in connection['social_media'] or search_string.lower().strip() == "":
+                if search_string is None or search_string.lower().strip() in connection['nome'].lower().strip() or search_string.lower().strip() in connection['redes_sociais'] or search_string.lower().strip() == "":
                     self.add_connection_banner(connection, "connected")
         else:
             for connection in self.not_connected:
-                if search_string is None or search_string.lower().strip() in connection['name'].lower().strip() or search_string.lower().strip() in connection['social_media'] or search_string.lower().strip() == "":
+                if search_string is None or search_string.lower().strip() in connection['nome'].lower().strip() or search_string.lower().strip() in connection['redes_sociais'] or search_string.lower().strip() == "":
                     self.add_connection_banner(connection, "not_connected")
 
     def switch_users_view(self):
