@@ -277,6 +277,19 @@ class HomeScreen(MDScreen):
 
     def mark_interest(self, banner, interest_button, interest_label):
         if interest_button.text == "Tenho interesse":
+            marca_interesse = Evento.addTemInteresse(login.usuario_logado.id, int(banner.id.split("_")[1]))
+            if not marca_interesse:
+                self.dialog = MDDialog(
+                    text="Ocorreu um erro ao marcar interesse no evento.",
+                    buttons=[MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+                )
+                self.dialog.open()
+                return
             interest_label.text = "Você demonstrou interesse no evento."
             interest_button.text = "Sem interesse"
             for event in self.events:
@@ -285,6 +298,19 @@ class HomeScreen(MDScreen):
                     # TODO: implementar lógica de marcar interesse com o API do backend
                     break
         else:
+            marca_desinteresse = Evento.deleteTemInteresse(login.usuario_logado.id, int(banner.id.split("_")[1]))
+            if not marca_desinteresse:
+                self.dialog = MDDialog(
+                    text="Ocorreu um erro ao desmarcar interesse no evento.",
+                    buttons=[MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+                )
+                self.dialog.open()
+                return
             interest_label.text = "Você não demonstrou interesse no evento."
             interest_button.text = "Tenho interesse"
             for event in self.events:
@@ -295,6 +321,19 @@ class HomeScreen(MDScreen):
 
     def mark_presence(self, banner, interest_button, interest_label):
         if interest_button.text == "Marcar presença":
+            marca_presenca = Evento.addParticipouDe(login.usuario_logado.id, int(banner.id.split("_")[1]))
+            if not marca_presenca:
+                self.dialog = MDDialog(
+                    text="Ocorreu um erro ao marcar presença no evento.",
+                    buttons=[MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+                )
+                self.dialog.open()
+                return
             interest_label.text = "Você marcou presença no evento."
             interest_button.text = "Marcar ausência"
             for event in self.events:
@@ -303,6 +342,19 @@ class HomeScreen(MDScreen):
                     # TODO: implementar lógica de marcar presença com o API do backend
                     break
         else:
+            marca_ausencia = Evento.deleteParticipouDe(login.usuario_logado.id, int(banner.id.split("_")[1]))
+            if not marca_ausencia:
+                self.dialog = MDDialog(
+                    text="Ocorreu um erro ao desmarcar presença no evento.",
+                    buttons=[MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+                )
+                self.dialog.open()
+                return
             interest_label.text = "Você não marcou presença no evento."
             interest_button.text = "Marcar presença"
             for event in self.events:
