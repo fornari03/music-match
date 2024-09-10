@@ -194,38 +194,32 @@ class Usuario:
     # metodo que cria uma relacao indicando que dois usuarios se conectaram, passando o email dos 2
     # (a gente pode mudar pra id, dependendo de como ficar la no front)
     @staticmethod
-    def connect(email1: str, email2: str):
+    def connect(id1: int, id2: int):
         # nao deixa conectar consigo msm
-        if (email1 == email2):
+        if (id1 == id2):
             return False        
 
-        user1 = Usuario.where({"email": email1})
-        user2 = Usuario.where({"email": email2})
+        user1 = Usuario.where({"id": id1})
+        user2 = Usuario.where({"id": id2})
 
         if user1 == False or user2 == False:
             return False
 
-        idUser1 = user1[0].id
-        idUser2 = user2[0].id
-
-        sql = f"INSERT INTO conecta_com (id_usuario_1, id_usuario_2) VALUES ({idUser1}, {idUser2})"
+        sql = f"INSERT INTO conecta_com (id_usuario_1, id_usuario_2) VALUES ({id1}, {id2})"
         if DBConnection.query(sql, False) == -1:
             return False
         return True
     
     # metodo que remove a relacao entre dois usuarios
     @staticmethod
-    def disconnect(email1: str, email2: str):
-        user1 = Usuario.where({"email": email1})
-        user2 = Usuario.where({"email": email2})
+    def disconnect(id1: int, id2: int):
+        user1 = Usuario.where({"id": id1})
+        user2 = Usuario.where({"id": id2})
 
         if user1 == False or user2 == False:
             return False
 
-        idUser1 = user1[0].id
-        idUser2 = user2[0].id
-
-        sql = f"DELETE FROM conecta_com WHERE (id_usuario_1={idUser1} OR id_usuario_1={idUser2}) AND (id_usuario_2={idUser1} OR id_usuario_2={idUser2})"
+        sql = f"DELETE FROM conecta_com WHERE (id_usuario_1={id1} OR id_usuario_1={id2}) AND (id_usuario_2={id1} OR id_usuario_2={id2})"
         if DBConnection.query(sql, False) == -1:
             return False
         return True
