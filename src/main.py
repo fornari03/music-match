@@ -1,9 +1,9 @@
 from kivymd.app import MDApp
 from kivy.lang import Builder
-from screens.layouts import KV
-from screens.login import *
-from screens.home import *
-from screens.sign_up import *
+from src.screens.layouts import KV
+from src.screens.login import *
+from src.screens.home import *
+from src.screens.sign_up import *
 
 class App(MDApp):
     def build(self):
