@@ -204,8 +204,7 @@ class HomeScreen(MDScreen):
         if erro:
             self.dialog = MDDialog(text="Ocorreu um erro ao salvar uma ou mais operações.").open()
             
-        self.on_pre_enter()     # VERIFICAR SE FUNCIONA E FAZ SENTIDO
-        # TODO: bloquear a interface por um tempo até receber tudo do banco de dados de novo
+        self.on_pre_enter()
 
 
 
@@ -735,7 +734,6 @@ class HomeScreen(MDScreen):
         self.dialog.open()
         self.ids.home_screen_bottom_nav.switch_tab("inicio")
         self.manager.current = "login_screen"
-        # TODO: implementar lógica de exclusão de conta com o API do backend
 
     def add_social_media_item(self, social_media: str, user_social_media: str="", checked: bool=False):
         new_item = OneLineIconListItem(on_press=lambda x: self.checkbox_selected(len(self.ids.lista_opcoes.children)))
