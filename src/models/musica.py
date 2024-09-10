@@ -106,7 +106,7 @@ class Musica:
             new_obj.__isNew = False
             with open (f"images/imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
                 arquivo.write(inst[2])
-            read_data = {"id": inst[0], "nome": inst[1], "capa": f'imagem_musica_{inst[0]}.jpg', "link_spotify": inst[3]}
+            read_data = {"id": inst[0], "nome": inst[1], "capa": f'images/imagem_musica_{inst[0]}.jpg', "link_spotify": inst[3]}
 
             # feedback positivo: True, negativo: False
             feedback_list.append((read_data, inst[4]))
@@ -117,7 +117,7 @@ class Musica:
             new_obj.__isNew = False
             with open (f"images/imagem_musica_{inst[0]}.jpg", 'wb') as arquivo:
                 arquivo.write(inst[2])
-            read_data = {"id": inst[0], "nome": inst[1], "capa": f"imagem_musica_{inst[0]}.jpg", "link_spotify": inst[3]}
+            read_data = {"id": inst[0], "nome": inst[1], "capa": f"images/imagem_musica_{inst[0]}.jpg", "link_spotify": inst[3]}
 
             no_feedback_list.append(read_data)
 
