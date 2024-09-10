@@ -32,8 +32,6 @@ class HomeScreen(MDScreen):
 
     def on_pre_enter(self):
         """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
-        # TODO: implementar lógica de receber os dados do usuário que fez o login com a API do backend
-
         self.evaluated, self.not_evaluated = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
         self.connected = Usuario.get_connections(login.usuario_logado.id)
         self.not_connected = Usuario.get_not_connections(login.usuario_logado.id)
@@ -45,8 +43,11 @@ class HomeScreen(MDScreen):
         self.data_nascimento = login.usuario_logado.data_nascimento
         self.ids.senha.text = ""
         self.user_redes_sociais = Usuario.findSocialMedia(login.usuario_logado.id)
-        for rede_social in self.user_redes_sociais:
-            self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
+        if not self.user_redes_sociais:
+            self.dialog = MDDialog(text="Erro ao buscar as redes sociais do usuário.").open()
+        else:
+            for rede_social in self.user_redes_sociais:
+                self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
 
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
         self.events = Evento.get_eventos(login.usuario_logado.id, self.connected)
@@ -706,11 +707,11 @@ class HomeScreen(MDScreen):
         new_item = OneLineIconListItem(on_press=lambda x: self.checkbox_selected(len(self.ids.lista_opcoes.children)))
 
         new_item.add_widget(MDCheckbox(size_hint_x=None, pos_hint={"center_y": 0.5}, active=checked))
-        new_item.add_widget(MDTextField(hint_text=social_media, size_hint_x=0.6, pos_hint={"center_y": 0.5, "center_x": 0.5}))
+        new_item.add_widget(MDTextField(hint_text=social_media.strip(), text=user_social_media.strip(), size_hint_x=0.6, pos_hint={"center_y": 0.5, "center_x": 0.5}))
         
         self.ids.lista_opcoes.add_widget(new_item)
 
-        self.ids.nova_rede_social.text = user_social_media
+        self.ids.nova_rede_social.text = ""
 
     def checkbox_selected(self, item_id):
         pass
