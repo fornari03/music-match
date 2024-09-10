@@ -194,7 +194,7 @@ MDScreenManager:
                         on_focus: if self.focus: root.show_date_picker()
                     MDTextField:
                         id: senha
-                        hint_text: "Senha"
+                        hint_text: "Nova Senha"
                         icon_right: "lock"
                         password: True
                         mode: "rectangle"

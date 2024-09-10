@@ -41,6 +41,8 @@ class Usuario:
 
     # salva o objeto usuario no banco de dados com os atributos que ele tem
     def save(self):
+        str_nasc = ""
+        str_senha = ""
         if self.nome == None:
             self.nome = "NULL"
         elif self.nome[0] != "'" and self.nome[-1] != "'":
@@ -52,18 +54,20 @@ class Usuario:
         if self.senha == None:
             self.senha = "NULL"
         elif self.senha[0] != "'" and self.senha[-1] != "'":
-            self.senha = f"'{self.senha}'"
+            str_senha = f"'{self.senha}'"
+        else:
+            str_senha = self.senha
         if self.data_nascimento == None:
             self.data_nascimento = "NULL"
-        elif self.data_nascimento[0] != "'" and self.data_nascimento[-1] != "'":
-            self.data_nascimento = f"'{self.data_nascimento}'"
+        else:
+            str_nasc = "'" + self.data_nascimento.strftime("%Y-%m-%d") + "'"
         if self.foto_perfil == None:
             self.foto_perfil = "NULL"
 
         if self.__isnew:
-            sql = f"INSERT INTO usuario (nome, email, senha, data_nascimento, foto_perfil) VALUES ({self.nome}, {self.email}, {self.senha}, {self.data_nascimento}, {self.foto_perfil})"
+            sql = f"INSERT INTO usuario (nome, email, senha, data_nascimento, foto_perfil) VALUES ({self.nome}, {self.email}, {str_senha}, {str_nasc}, {self.foto_perfil})"
         else:
-            sql = f"UPDATE usuario SET nome={self.nome}, email={self.email}, senha={self.senha}, data_nascimento={self.data_nascimento}, foto_perfil={self.foto_perfil} WHERE id={self.id}"
+            sql = f"UPDATE usuario SET nome={self.nome}, email={self.email}, senha={str_senha}, data_nascimento={str_nasc}, foto_perfil={self.foto_perfil} WHERE id={self.id}"
 
         if DBConnection.query(sql, False) == -1:
             return False
@@ -108,25 +112,7 @@ class Usuario:
     # apaga as instancias no BD com aqueles dados
     @staticmethod
     def delete(idUser: int):
-        sql = f"DELETE FROM redes_sociais WHERE id_usuario={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM conecta_com WHERE id_usuario_1={idUser} OR id_usuario_2={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM usuario_avalia_musica WHERE id_usuario={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM tem_interesse WHERE id_usuario={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM participou_de WHERE id_usuario={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM usuario WHERE id={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        return True
+        return DBConnection.delete_user(idUser)
     
     # metodos CRUD pra rede social do usuario de email dado lembrando que o email eh unico para cada usuario
     # socMed = qual a rede Social
