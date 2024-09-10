@@ -661,6 +661,14 @@ class HomeScreen(MDScreen):
             self.dialog = MDDialog(text="Erro ao salvar os dados no banco de dados.").open()
             return
 
+        self.ids.lista_opcoes.clear_widgets()
+        self.user_redes_sociais = Usuario.findSocialMedia(login.usuario_logado.id)
+        if not self.user_redes_sociais:
+            self.dialog = MDDialog(text="Erro ao buscar as redes sociais do usuário.").open()
+        else:
+            for rede_social in self.user_redes_sociais:
+                self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
+
         # nao precisa reescrever os campos pq eh literalmente o que ja ta escrito la
         self.dialog = MDDialog(text="Dados atualizados com sucesso!").open()
 
