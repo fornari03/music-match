@@ -108,25 +108,7 @@ class Usuario:
     # apaga as instancias no BD com aqueles dados
     @staticmethod
     def delete(idUser: int):
-        sql = f"DELETE FROM redes_sociais WHERE id_usuario={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM conecta_com WHERE id_usuario_1={idUser} OR id_usuario_2={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM usuario_avalia_musica WHERE id_usuario={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM tem_interesse WHERE id_usuario={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM participou_de WHERE id_usuario={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        sql = f"DELETE FROM usuario WHERE id={idUser}"
-        if DBConnection.query(sql, False):
-            return False
-        return True
+        return DBConnection.delete_user(idUser)
     
     # metodos CRUD pra rede social do usuario de email dado lembrando que o email eh unico para cada usuario
     # socMed = qual a rede Social

@@ -43,7 +43,7 @@ class DBConnection:
         conn = psycopg2.connect(**load_config())
 
         curs = conn.cursor()
-
+        ok = True
         try:
             sql = f"DELETE FROM redes_sociais WHERE id_usuario={id}"
             curs.execute(sql)
@@ -67,6 +67,8 @@ class DBConnection:
         except Exception as erro:
             print("Erro na delecao do usuario do SQL:", erro, ", tipo: ", type(erro))
             conn.rollback()
+            ok = False
         finally:
             curs.close()
             conn.close()
+            return ok
