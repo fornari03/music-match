@@ -14,9 +14,10 @@ from kivymd.uix.list import MDList
 from kivymd.uix.fitimage import FitImage
 import webbrowser
 from datetime import datetime, timedelta
-from ..models.musica import Musica
 
+from ..models.musica import Musica
 from ..models.usuario import Usuario
+from ..models.evento import Evento
 import src.screens.login as login
 
 class HomeScreen(MDScreen):
@@ -32,8 +33,6 @@ class HomeScreen(MDScreen):
     def on_pre_enter(self):
         """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
         # TODO: implementar lógica de receber os dados do usuário que fez o login com a API do backend
-        # TODO: implementar lógica de receber todos os eventos passados e futuros com a API do backend (ordem cronológica)
-        # TODO: implementar lógica de receber os usuários conectados e não conectados com a API do backend (ordem por music_match)
 
         self.evaluated, self.not_evaluated = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
         self.connected = Usuario.get_connections(login.usuario_logado.id)
@@ -50,16 +49,11 @@ class HomeScreen(MDScreen):
             self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
 
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
+        self.events = Evento.get_eventos(login.usuario_logado.id, self.connected)
 
         self.show_music_list()
 
         self.show_connections_grid()
-
-        self.events = [
-            {"id": 1, "name": "HH Ceubinho", "descricao": "HH do Ceubinho é o melhor que tem uau que festa legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-09-12 19:00:00", "conexoes_interessadas": [], "image": "screens/imagem.jpg", "status": "I", "artistas": ["artista1"], "generos": ["Funk", "Pop"]},
-            {"id": 2, "name": "Show Bruno Mars", "descricao": "O Bruninho vem para Brasília ebaaaaaaaaaaa.", "localizacao": "Estádio Mané Garrinhcha", "data": "2024-10-26 18:00:00", "conexoes_interessadas": self.connected, "image": "screens/imagem.jpg", "status": "N", "artistas": ["Bruno Mars"], "generos": ["Pop"]},
-            {"id": 3, "name": "Festa do Calouro", "descricao": "Festa do Calouro da UnB, vai ser muito legal.", "localizacao": "UnB - Darcy Ribeiro - Ceubinho", "data": "2024-08-12 19:00:00", "conexoes_foram": [], "image": "screens/imagem.jpg", "status": "P", "artistas": ["artista1", "artista2"], "generos": ["Funk", "Pop"]},
-        ]
 
         self.show_events_grid()
 
@@ -91,7 +85,7 @@ class HomeScreen(MDScreen):
         }
         
         # abre o spotify na musica clicada
-        item.on_release = lambda: webbrowser.open(music['spotify_link'])
+        item.on_release = lambda: webbrowser.open(music['link_spotify'])
         
         self.ids.music_list.add_widget(item)
 
@@ -214,24 +208,23 @@ class HomeScreen(MDScreen):
 
         grid_layout = MDGridLayout(cols=2, padding=[5, 10, 5, 10], spacing=10)
 
-        grid_layout.add_widget(FitImage(source="screens/imagem.jpg", size_hint_y=None, height="260dp", radius=[15]))
+        grid_layout.add_widget(FitImage(source=f"images/imagem_evento_{event['id']}.jpg", size_hint_y=None, height="260dp", radius=[15]))
 
         box_layout = MDBoxLayout(orientation="vertical", spacing=5)
 
-        box_layout.add_widget(MDLabel(text=event['name'], size_hint=(1, 0.4), bold=True))
+        box_layout.add_widget(MDLabel(text=event['nome'], size_hint=(1, 0.4), bold=True))
 
         box_layout.add_widget(MDLabel(text=event['descricao'], size_hint=(1, 0.7)))
 
-        data_evento = datetime.strptime(event['data'], "%Y-%m-%d %H:%M:%S")
-        box_layout.add_widget(MDLabel(text=f"Data: {data_evento.strftime('%d/%m/%Y - %H:%M')}", size_hint=(1, 0.6)))
+        box_layout.add_widget(MDLabel(text=f"Data: {event['data_realizacao'].strftime('%d/%m/%Y - %H:%M')}", size_hint=(1, 0.6)))
 
         box_layout.add_widget(MDLabel(text=f"Local: {event['localizacao']}", size_hint=(1, 0.6)))
 
         box_layout.add_widget(MDLabel(text=f"Artistas: {', '.join(event['artistas'])}", size_hint=(1, 0.6)))
 
-        box_layout.add_widget(MDLabel(text=f"Estilos: {', '.join(event['generos'])}", size_hint=(1, 0.6)))
+        box_layout.add_widget(MDLabel(text=f"Estilos: {', '.join(event['estilos'])}", size_hint=(1, 0.6)))
 
-        if data_evento >= datetime.now():
+        if event['data_realizacao'] >= datetime.now():
             if len(event['conexoes_interessadas']) == 0:
                 texto = "Nenhuma conexão se interessou neste evento."
             elif len(event['conexoes_interessadas']) == 1:
@@ -292,53 +285,99 @@ class HomeScreen(MDScreen):
 
     def mark_interest(self, banner, interest_button, interest_label):
         if interest_button.text == "Tenho interesse":
+            marca_interesse = Evento.addTemInteresse(login.usuario_logado.id, int(banner.id.split("_")[1]))
+            if not marca_interesse:
+                self.dialog = MDDialog(
+                    text="Ocorreu um erro ao marcar interesse no evento.",
+                    buttons=[MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+                )
+                self.dialog.open()
+                return
             interest_label.text = "Você demonstrou interesse no evento."
             interest_button.text = "Sem interesse"
             for event in self.events:
                 if event['id'] == int(banner.id.split("_")[1]):
                     event['status'] = "I"
-                    # TODO: implementar lógica de marcar interesse com o API do backend
                     break
         else:
+            marca_desinteresse = Evento.deleteTemInteresse(login.usuario_logado.id, int(banner.id.split("_")[1]))
+            if not marca_desinteresse:
+                self.dialog = MDDialog(
+                    text="Ocorreu um erro ao desmarcar interesse no evento.",
+                    buttons=[MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+                )
+                self.dialog.open()
+                return
             interest_label.text = "Você não demonstrou interesse no evento."
             interest_button.text = "Tenho interesse"
             for event in self.events:
                 if event['id'] == int(banner.id.split("_")[1]):
                     event['status'] = "N"
-                    # TODO: implementar lógica de marcar desinteresse com o API do backend
                     break
 
     def mark_presence(self, banner, interest_button, interest_label):
         if interest_button.text == "Marcar presença":
+            marca_presenca = Evento.addParticipouDe(login.usuario_logado.id, int(banner.id.split("_")[1]))
+            if not marca_presenca:
+                self.dialog = MDDialog(
+                    text="Ocorreu um erro ao marcar presença no evento.",
+                    buttons=[MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+                )
+                self.dialog.open()
+                return
             interest_label.text = "Você marcou presença no evento."
             interest_button.text = "Marcar ausência"
             for event in self.events:
                 if event['id'] == int(banner.id.split("_")[1]):
                     event['status'] = "P"
-                    # TODO: implementar lógica de marcar presença com o API do backend
                     break
         else:
+            marca_ausencia = Evento.deleteParticipouDe(login.usuario_logado.id, int(banner.id.split("_")[1]))
+            if not marca_ausencia:
+                self.dialog = MDDialog(
+                    text="Ocorreu um erro ao desmarcar presença no evento.",
+                    buttons=[MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+                )
+                self.dialog.open()
+                return
             interest_label.text = "Você não marcou presença no evento."
             interest_button.text = "Marcar presença"
             for event in self.events:
                 if event['id'] == int(banner.id.split("_")[1]):
                     event['status'] = "N"
-                    # TODO: implementar lógica de marcar ausência com o API do backend
                     break
 
     def show_events_grid(self, search_string=None):
         self.ids.events_grid.clear_widgets()
         if self.showing_future_events:
             for event in self.events:
-                data_evento = datetime.strptime(event['data'], "%Y-%m-%d %H:%M:%S")
-                if data_evento >= datetime.now():
-                    if search_string is None or search_string.lower().strip() in event['name'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in data_evento.strftime('%d/%m/%Y - %H:%M'):
+                if event['data_realizacao'] >= datetime.now():
+                    if search_string is None or search_string.lower().strip() in event['nome'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in event['data_realizacao'].strftime('%d/%m/%Y - %H:%M'):
                         self.add_event_banner(event)
         else:
             for event in self.events:
-                data_evento = datetime.strptime(event['data'], "%Y-%m-%d %H:%M:%S")
-                if data_evento < datetime.now():
-                    if search_string is None or search_string.lower().strip() in event['name'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in data_evento.strftime('%d/%m/%Y - %H:%M'):
+                if event['data_realizacao'] < datetime.now():
+                    if search_string is None or search_string.lower().strip() in event['nome'].lower().strip() or search_string.lower().strip() in event['descricao'] or search_string.lower().strip() == "" or search_string.lower().strip() in event['localizacao'].lower().strip() or search_string.lower().strip() in event['data_realizacao'].strftime('%d/%m/%Y - %H:%M'):
                         self.add_event_banner(event)
 
     def switch_events_view(self):
@@ -372,7 +411,7 @@ class HomeScreen(MDScreen):
     ############################## Tela de Conexões ##############################
 
     def add_connection_banner(self, connection, status):
-        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300, on_release=lambda x: self.open_profile(connection))
+        banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300)
 
         box_layout = MDBoxLayout(orientation="vertical", padding=[10], spacing=10)
 
@@ -423,13 +462,27 @@ class HomeScreen(MDScreen):
     def confirm_disconect(self, idx):
         """Método que apaga o MDCard da conexão com o usuário de índice idx no grid."""
         self.dialog.dismiss()
+        i = len(self.connected) - idx - 1
+        user = self.connected[i]
+        query_ret = Usuario.disconnect(login.usuario_logado.id, user['id'])
+        if not query_ret:
+            self.dialog = MDDialog(
+                text="Ocorreu um erro ao desconectar do usuário.",
+                buttons=[
+                    MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )])
+            self.dialog.open()
+            return
+    
         self.ids.connections_grid.remove_widget(self.ids.connections_grid.children[idx])
-        idx = len(self.connected) - idx - 1
-        user = self.connected[idx]
         self.not_connected.append(user)
-        self.connected.pop(idx)
+        self.not_connected.sort(key=lambda x: x['sintonia'], reverse=True)
+        self.connected.pop(i)
         self.show_connections_grid()
-        # TODO: implementar lógica de remoção de conexão com o API do backend
 
     def add_connection(self, banner):
         for i in range(len(self.ids.connections_grid.children)-1, -1, -1):
@@ -455,17 +508,30 @@ class HomeScreen(MDScreen):
     def confirm_connect(self, idx):
         """Método que adiciona o MDCard da conexão com o usuário de índice idx no grid."""
         self.dialog.dismiss()
+        i = len(self.not_connected) - idx - 1
+        user = self.not_connected[i]
+        query_ret = Usuario.connect(login.usuario_logado.id, user['id'])
+        if not query_ret:
+            self.dialog = MDDialog(
+                text="Ocorreu um erro ao conectar com o usuário.",
+                buttons=[
+                    MDFlatButton(
+                        text="Ok",
+                        theme_text_color="Custom",
+                        text_color=self.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    )]
+            )
+            self.dialog.open()
+            return
+
         self.ids.connections_grid.remove_widget(self.ids.connections_grid.children[idx])
-        idx = len(self.not_connected) - idx - 1
-        user = self.not_connected[idx]
         self.connected.append(user)
-        self.not_connected.pop(idx)
+        self.connected.sort(key=lambda x: x['sintonia'], reverse=True)
+        self.not_connected.pop(i)
         self.show_connections_grid()
-        # TODO: implementar lógica de adição de conexão com o API do backend
 
     def show_connections_grid(self, search_string=None):
-        # TODO: melhorar algoritmo de mostrar usuários conectados e não conectados,
-        # calcular e ordenar por music_match
         self.ids.connections_grid.clear_widgets()
         if self.showing_users_connected:
             for connection in self.connected:
