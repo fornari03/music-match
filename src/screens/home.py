@@ -30,9 +30,22 @@ class HomeScreen(MDScreen):
 
     def on_pre_enter(self):
         """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
-        self.evaluated, self.not_evaluated = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
+        musicas = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
+        if not musicas:
+            self.dialog = MDDialog(text="Erro ao buscar as músicas do usuário.").open()
+            self.manager.current = "login_screen"
+            return
+        self.evaluated, self.not_evaluated = musicas
         self.connected = Usuario.get_connections(login.usuario_logado.id)
+        if not self.connected:
+            self.dialog = MDDialog(text="Erro ao buscar as conexões do usuário.").open()
+            self.manager.current = "login_screen"
+            return
         self.not_connected = Usuario.get_not_connections(login.usuario_logado.id)
+        if not self.not_connected:
+            self.dialog = MDDialog(text="Erro ao buscar as conexões do usuário.").open()
+            self.manager.current = "login_screen"
+            return
 
         # informacoes do perfil
         self.ids.nome.text = login.usuario_logado.nome
@@ -42,13 +55,18 @@ class HomeScreen(MDScreen):
         self.ids.senha.text = ""
         self.user_redes_sociais = Usuario.findSocialMedia(login.usuario_logado.id)
         if not self.user_redes_sociais:
-            self.dialog = MDDialog(text="Erro ao buscar as redes sociais do usuário.").open()
-        else:
-            for rede_social in self.user_redes_sociais:
-                self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
+            self.dialog = MDDialog(text="Erro ao buscar os dados do usuário.").open()
+            self.manager.current = "login_screen"
+            return
+        for rede_social in self.user_redes_sociais:
+            self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
 
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
         self.events = Evento.get_eventos(login.usuario_logado.id, self.connected)
+        if not self.events:
+            self.dialog = MDDialog(text="Erro ao buscar os eventos.").open()
+            self.manager.current = "login_screen"
+            return
 
         self.show_music_list()
 
