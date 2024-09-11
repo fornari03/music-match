@@ -308,29 +308,13 @@ class Usuario:
             sintonia = otherUser[2]
             otherUser = Usuario.others_to_dict(otherUser[0])
             otherUser["sintonia"] = sintonia
-            sql = f"""SELECT ar.nome FROM usuario_avalia_musica av
-                        JOIN artista_tem_musica atm ON av.id_musica = atm.id_musica
-                        JOIN artista ar ON atm.id_artista = ar.id
-                        WHERE av.id_usuario = {otherUser['id']} 
-                              AND av.feedback = TRUE
-                        GROUP BY ar.id, ar.nome
-                        ORDER BY COUNT(*) DESC
-                        LIMIT 3;
-                        """
+            sql = f"""SELECT nome FROM artistas_mais_curtidos as t WHERE t.id_usuario={otherUser['id']} LIMIT 3"""
             artistas = DBConnection.query(sql, True)
             if artistas == -1:
                 return False
             otherUser["artists"] = [artista[0] for artista in artistas]
 
-            sql = f"""SELECT em.nome FROM usuario_avalia_musica av
-                        JOIN pertence_ao pa ON av.id_musica = pa.id_musica
-                        JOIN estilo_musical em ON pa.id_estilo_musical = em.id
-                        WHERE av.id_usuario = {otherUser['id']} 
-                              AND av.feedback = TRUE
-                        GROUP BY em.id, em.nome
-                        ORDER BY COUNT(*) DESC
-                        LIMIT 3;
-                        """
+            sql = f"""SELECT nome FROM estilos_mais_curtidos as t WHERE t.id_usuario={otherUser['id']} LIMIT 3"""
             gosto_musical = DBConnection.query(sql, True)
             if gosto_musical == -1:
                 return False
@@ -357,29 +341,13 @@ class Usuario:
             sintonia = otherUser[2]
             otherUser = Usuario.others_to_dict(otherUser[0])
             otherUser["sintonia"] = sintonia
-            sql = f"""SELECT ar.nome FROM usuario_avalia_musica av
-                        JOIN artista_tem_musica atm ON av.id_musica = atm.id_musica
-                        JOIN artista ar ON atm.id_artista = ar.id
-                        WHERE av.id_usuario = {otherUser['id']} 
-                              AND av.feedback = TRUE
-                        GROUP BY ar.id, ar.nome
-                        ORDER BY COUNT(*) DESC
-                        LIMIT 3;
-                        """
+            sql = f"""SELECT nome FROM artistas_mais_curtidos as t WHERE t.id_usuario={otherUser['id']} LIMIT 3;"""
             artistas = DBConnection.query(sql, True)
             if artistas == -1:
                 return False
             otherUser["artists"] = [artista[0] for artista in artistas]
 
-            sql = f"""SELECT em.nome FROM usuario_avalia_musica av
-                        JOIN pertence_ao pa ON av.id_musica = pa.id_musica
-                        JOIN estilo_musical em ON pa.id_estilo_musical = em.id
-                        WHERE av.id_usuario = {otherUser['id']} 
-                              AND av.feedback = TRUE
-                        GROUP BY em.id, em.nome
-                        ORDER BY COUNT(*) DESC
-                        LIMIT 3;
-                        """
+            sql = f"""SELECT nome FROM estilos_mais_curtidos as t WHERE t.id_usuario={otherUser['id']} LIMIT 3"""
             gosto_musical = DBConnection.query(sql, True)
             if gosto_musical == -1:
                 return False
