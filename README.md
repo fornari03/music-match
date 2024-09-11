@@ -16,7 +16,111 @@ O Music Match é um aplicativo com uma temática musical onde é possível estab
 ![Diagrama Modelo Relacional](https://github.com/user-attachments/assets/05263f7b-e672-4a76-a6f2-7ea6cbb35cb6)
 
 ## Consultas em álgebra relacional
+### Consulta 1: Encontrar todas as músicas de um estilo musical específico, junto com o artista que as compôs.
 
+π_Musica.nome, Artista.nome
+(σ_Estilo_musical.nome='Rock'
+ (Musica ⨝ pertence_ao ⨝ Estilo_musical ⨝ artista_tem_musica ⨝ Artista))
+
+Tabelas envolvidas:
+
+Musica: contém as informações das músicas.
+
+Artista: contém as informações dos artistas.
+
+artista_tem_musica: relaciona músicas com seus respectivos artistas.
+
+pertence_ao: relaciona músicas com seus estilos musicais.
+
+Estilo_musical: contém os nomes dos estilos musicais.
+
+Descrição: A consulta começa selecionando os estilos musicais cujo nome seja "Rock". Em seguida, realiza junções entre as tabelas Musica, artista_tem_musica, Artista, pertence_ao e Estilo_musical. O objetivo é encontrar o nome das músicas e seus respectivos artistas associados ao estilo "Rock".
+
+
+### Consulta 2: Listar todos os eventos que envolvem um estilo musical específico e os artistas que participam deles.
+
+π_Evento.nome, Artista.nome
+(σ_Estilo_musical.nome='Jazz'
+ (Estilo_musical ⨝ evento_tem_estilo_musical ⨝ Evento ⨝ participa ⨝ Artista))
+
+
+Tabelas envolvidas:
+
+Evento: contém as informações dos eventos.
+
+Artista: contém as informações dos artistas.
+
+participa: relaciona artistas com eventos.
+
+evento_tem_estilo_musical: relaciona eventos com estilos musicais.
+
+Estilo_musical: contém os nomes dos estilos musicais.
+
+Descrição: A consulta filtra eventos cujo estilo musical seja "Jazz". As tabelas Evento, participa, Artista, evento_tem_estilo_musical e Estilo_musical são unidas para encontrar os eventos e os artistas que participaram deles, relacionados ao estilo musical "Jazz".
+
+
+### Consulta 3: Encontrar os usuários que avaliaram uma música com um estilo musical específico.
+
+π_Usuario.nome, Musica.nome
+(σ_Estilo_musical.nome='Pop'
+ (Usuario ⨝ usuario_avalia_musica ⨝ Musica ⨝ pertence_ao ⨝ Estilo_musical))
+
+Tabelas envolvidas:
+
+Usuario: contém as informações dos usuários.
+
+usuario_avalia_musica: relaciona usuários com músicas avaliadas.
+
+Musica: contém as informações das músicas.
+
+pertence_ao: relaciona músicas com seus estilos musicais.
+
+Estilo_musical: contém os nomes dos estilos musicais.
+
+Descrição: A consulta procura por músicas do estilo "Pop" que foram avaliadas por usuários. As tabelas Usuario, usuario_avalia_musica, Musica, pertence_ao e Estilo_musical são unidas para identificar os usuários e as músicas que eles avaliaram, relacionadas ao estilo "Pop".
+
+
+### Consulta 4: Encontrar todos os usuários que têm interesse em um evento específico, junto com o nome do evento.
+
+π_Usuario.nome, Evento.nome
+(σ_Evento.id=1
+ (Usuario ⨝ tem_interesse ⨝ Evento))
+
+Tabelas envolvidas: 
+
+Usuario: contém informações dos usuários.
+
+tem_interesse: relaciona usuários aos eventos nos quais eles têm interesse.
+
+Evento: contém informações dos eventos.
+
+A seleção (σ) filtra os registros da tabela Evento para o evento específico com id = 1.
+
+As junções (⨝) conectam as tabelas Usuario, tem_interesse e Evento para formar um conjunto de dados que relaciona usuários aos eventos de interesse.
+
+A projeção (π) retorna os nomes dos usuários e o nome do evento.
+
+
+### Consulta 5: Listar todos os eventos em que um artista específico participa.
+
+π_Evento.nome
+(σ_Artista.id=2
+ (Evento ⨝ participa ⨝ Artista))
+
+
+Tabelas envolvidas:
+
+Evento: contém informações dos eventos.
+
+Artista: contém informações dos artistas.
+
+participa: relaciona artistas aos eventos nos quais eles participam.
+
+A seleção (σ) filtra os registros da tabela Artista para o artista específico com id = 2.
+
+As junções (⨝) conectam as tabelas Evento, participa e Artista para formar um conjunto de dados que relaciona eventos ao artista.
+
+A projeção (π) retorna os nomes dos eventos em que o artista participa. 
 
 ## Avaliação das formas normais das tabelas
 
