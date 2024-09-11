@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS Evento
     descricao text,
     localizacao text,
     data_realizacao timestamp,
-    foto bytea
+    imagem bytea
 );
 
 -- outra query
