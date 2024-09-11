@@ -8,7 +8,7 @@ O Music Match é um aplicativo com uma temática musical onde é possível estab
 
 
 ## Modelo Relacional
-
+![Diagrama Modelo Relacional](https://github.com/user-attachments/assets/05263f7b-e672-4a76-a6f2-7ea6cbb35cb6)
 
 ## Consultas em álgebra relacional
 
