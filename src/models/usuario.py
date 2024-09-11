@@ -15,6 +15,9 @@ class Usuario:
 
     # troca os valores dos atributos
     def change_values(self, data: dict):
+        """
+        Metodo para mudar os valores do usuario para os valores passados no dicionario
+        """
         for key in data.keys():
             # tem que ter + condicao pro id, nem sei se eh bom deixar mudar id
             if key == 'id' and not self.__isnew:
@@ -37,10 +40,16 @@ class Usuario:
     
     # metodo privado pra dizer se uma instancia desse objeto foi criada pelo programa (True) ou se foi importada do BD (False)
     def __setIsNew(self, val: bool):
+        """
+        Método privado pra dizer se uma instancia desse objeto foi criada pelo programa (True) ou se foi importada do BD (False)
+        """
         self.__isnew = val
 
     # salva o objeto usuario no banco de dados com os atributos que ele tem
     def save(self):
+        """
+        Metodo para salvar o usuario no banco de dados
+        """
         str_nasc = ""
         str_senha = ""
         if self.nome == None:
@@ -80,6 +89,9 @@ class Usuario:
     # lembra de colocar as aspas simples em volta dos valores que sao text la no BD
     @staticmethod
     def where(data: dict):
+        """
+        Metodo para buscar usuarios no banco de dados
+        """
         sql = "SELECT id, nome, email, senha, data_nascimento, foto_perfil FROM usuario"
         # se coloca parenteses entre os nomes da coluna o retorno eh uma string que quebra o codigo, n entendi direito o pq :)
 
@@ -112,6 +124,9 @@ class Usuario:
     # apaga as instancias no BD com aqueles dados
     @staticmethod
     def delete(idUser: int):
+        """
+        Metodo para deletar um usuario do banco de dados
+        """
         return DBConnection.delete_user(idUser)
     
     # metodos CRUD pra rede social do usuario de email dado lembrando que o email eh unico para cada usuario
@@ -120,6 +135,9 @@ class Usuario:
 
     @staticmethod
     def findSocialMedia(id: int):
+        """
+        Busca as redes sociais de um usuario
+        """
         user = Usuario.where({"id": id})
 
         if user == False:
@@ -134,6 +152,9 @@ class Usuario:
     
     @staticmethod
     def addSocialMedia(id: int, socMed: str, userSocMed: str):
+        """
+        Adiciona uma rede social a um usuario
+        """
         user = Usuario.where({"id": id})
 
         # deveria ter um check bonitinho pra ver se tem as aspas simples, mas fazer o que
@@ -149,6 +170,9 @@ class Usuario:
     
     @staticmethod
     def editSocialMediaUsername(id: int, socMed: str, userSocMed: str):
+        """
+        Atualiza o user de uma rede social de um usuario
+        """
         user = Usuario.where({"id": id})
 
         if user == False:
@@ -161,6 +185,9 @@ class Usuario:
     
     @staticmethod
     def deleteSocialMedia(id: int, socMed: str):
+        """
+        Deleta uma rede social de um usuario
+        """
         user = Usuario.where({"id": id})
 
         if user == False:
@@ -175,6 +202,9 @@ class Usuario:
     # (a gente pode mudar pra id, dependendo de como ficar la no front)
     @staticmethod
     def connect(id1: int, id2: int):
+        """
+        Cria uma conexao entre dois usuarios
+        """
         # nao deixa conectar consigo msm
         if (id1 == id2):
             return False        
@@ -193,6 +223,9 @@ class Usuario:
     # metodo que remove a relacao entre dois usuarios
     @staticmethod
     def disconnect(id1: int, id2: int):
+        """
+        Deleta a conexao entre dois usuarios
+        """
         user1 = Usuario.where({"id": id1})
         user2 = Usuario.where({"id": id2})
 
@@ -208,6 +241,9 @@ class Usuario:
     # da pra gente fazer um join table pra gente retornar os emails, mas por enquanto so retorna os ids
     @staticmethod
     def findConnections(id: int):
+        """
+        Busca as conexões de um usuario
+        """
         user = Usuario.where({"id": id})
 
         if user == False:
@@ -231,6 +267,9 @@ class Usuario:
 
     @staticmethod
     def findNotConnections(id: int):
+        """
+        Busca os usuários que não são conexões de um usuário
+        """
         user = Usuario.where({"id": id})
 
         if user == False:
@@ -253,6 +292,9 @@ class Usuario:
     
     @staticmethod
     def get_connections(id: int):
+        """
+        Retorna os usuarios conectados a um usuario
+        """
         user = Usuario.where({"id": id})
         if user == False:
             return False
@@ -299,6 +341,9 @@ class Usuario:
     
     @staticmethod
     def get_not_connections(id: int):
+        """
+        Retorna os usuarios que não são conectados a um usuario
+        """
         user = Usuario.where({"id": id})
         if user == False:
             return False
@@ -345,6 +390,9 @@ class Usuario:
     
     @staticmethod
     def others_to_dict(id: int):
+        """
+        Transforma parte de um usuario em um dicionario
+        """
         user = Usuario.where({"id": id})[0]
         return {
             "id": user.id,

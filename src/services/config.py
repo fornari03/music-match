@@ -1,6 +1,9 @@
 from configparser import ConfigParser
 
 def load_config(filename='src/services/database.ini', section='postgresql'):
+    """
+    Faz a leitura do arquivo de configuração e retorna um dicionário com as configurações
+    """
     parser = ConfigParser()
     parser.read(filename)
 

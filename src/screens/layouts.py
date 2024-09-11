@@ -17,7 +17,7 @@ MDScreenManager:
             orientation: 'vertical'
             spacing: dp(5)
             MDLabel:
-                text: "TuneLink"
+                text: "MusicMatch"
                 halign: "center"
                 theme_text_color: "Custom"
                 text_color: (1, 0, 1, 1)

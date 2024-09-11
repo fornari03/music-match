@@ -2,6 +2,9 @@ import hashlib
 
 # criptografa uma senha
 def encrypt_password(password: str):
+        """
+        Criptografa uma senha
+        """
         if password == None:
                 return None
       

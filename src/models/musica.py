@@ -12,6 +12,9 @@ class Musica:
         self.__isNew = True
 
     def change_values(self, data):
+        """
+        Metodo para mudar os valores da Musica para os valores passados no dicionario
+        """
         for key in data.keys():
             if key == "id":
                 self.id = data[key]
@@ -23,6 +26,9 @@ class Musica:
                 self.link_spotify = data[key]
 
     def save(self):
+        """
+        Metodo para salvar a Musica no banco de dados
+        """
         if self.nome == None:
             self.nome = "NULL"
         elif self.nome[0] != "'" and self.nome[-1] != "'":
@@ -45,6 +51,9 @@ class Musica:
 
     @staticmethod
     def where(data: dict):
+        """
+        Metodo para buscar Musicas no banco de dados
+        """
         sql = "SELECT id, nome, capa, link_spotify FROM musica"
         # se coloca parenteses entre os nomes da coluna o retorno eh uma string que quebra o codigo, n entendi direito o pq :)
 
@@ -77,6 +86,9 @@ class Musica:
     # esta retornando uma lista de tuplas em que o primeiro elemento da tupla eh o nome do artista
     @staticmethod
     def getArtistsName(idMusic: int):
+        """
+        Metodo para buscar o nome dos artistas de uma musica
+        """
         sql = f"SELECT a.nome FROM artista a JOIN artista_tem_musica atm ON a.id=atm.id_artista WHERE atm.id_musica={idMusic}"
 
         query_ans = DBConnection.query(sql, True)
@@ -89,6 +101,9 @@ class Musica:
     # uma com as musicas sem feedback, so com o objeto
     @staticmethod
     def classifyMusic(idUser: int):
+        """
+        Metodo para classificar e retornar as musicas entre as que ja foram avaliadas e as que nao foram
+        """
         sql_feedback = f"SELECT m.id, m.nome, m.capa, m.link_spotify, uam.feedback FROM musica m JOIN usuario_avalia_musica uam ON m.id=uam.id_musica WHERE uam.id_usuario={idUser}"
         sql_no_feedback = f"SELECT m.id, m.nome, m.capa, m.link_spotify FROM musica m WHERE m.id NOT IN (SELECT uam.id_musica FROM usuario_avalia_musica uam WHERE uam.id_usuario={idUser})"
 
@@ -126,6 +141,9 @@ class Musica:
     # cria um feedback entre a musica e o usuario com os ids especificados
     @staticmethod
     def createFeedback(idMusic: int, idUser: int, feedback: bool):
+        """
+        Cria um feedback entre a musica e o usuario, podendo ser like ou dislike
+        """
         sql = f"INSERT INTO usuario_avalia_musica (id_usuario, id_musica, feedback) VALUES ({idUser}, {idMusic}, {feedback})"
 
         if DBConnection.query(sql, False) == -1:
@@ -135,6 +153,9 @@ class Musica:
     # retira o feedback do usuario idUser pra musica idMusic
     @staticmethod
     def removeFeedback(idMusic: int, idUser: int):
+        """
+        Deleta o feedback do usuario para a musica
+        """
         sql = f"DELETE FROM usuario_avalia_musica WHERE id_usuario={idUser} AND id_musica={idMusic}"
 
         if DBConnection.query(sql, False) == -1:
@@ -144,6 +165,9 @@ class Musica:
     # atualiza o feedback do usuario idUser para a musica idMusic
     @staticmethod
     def updateFeedback(idMusic: int, idUser: int, feedback: bool):
+        """
+        Atualiza o feedback do usuario para a musica
+        """
         sql = f"UPDATE usuario_avalia_musica SET feedback = {feedback} WHERE id_usuario = {idUser} AND id_musica = {idMusic}"
         
         if DBConnection.query(sql, False) == -1:
@@ -153,6 +177,9 @@ class Musica:
     # pega os estilos musicais de uma musica
     @staticmethod
     def getEstilosMusicais(idMusic: int):
+        """
+        Retorna os estilos musicais de uma musica
+        """
         sql = f"SELECT em.nome FROM pertence_ao pa JOIN estilo_musical em ON em.id=pa.id_estilo_musical WHERE pa.id_musica={idMusic}"
 
         query_ans = DBConnection.query(sql, True)
@@ -163,6 +190,9 @@ class Musica:
 
     @staticmethod
     def getEvaluatedAndNotEvaluatedMusics(idUser: int):
+        """
+        Retorna todas as musicas avaliadas e nao avaliadas de um usuario, com artistas, estilos e avaliacao
+        """
         user = Usuario.where({"id": idUser})
         if user == False:
             return False

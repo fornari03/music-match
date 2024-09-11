@@ -9,6 +9,9 @@ class Artista:
         self.__isNew = True
 
     def change_values(self, data: dict):
+        """
+        Muda os valores do artista para os valores passados no dicionario
+        """
         for key in data.keys():
             if key == 'id':
                 self.id = data[key]
@@ -20,6 +23,9 @@ class Artista:
     # se eh uma nova instancia da problema do self.id nao ficar atualizado
     # esses consertos podem dar muito problema se fizer SAVE 2 vezes seguidas
     def save(self):
+        """
+        Metodo para salvar o artista no banco de dados
+        """
         if self.id == None:
             self.id = "NULL"
         if self.nome == None:
@@ -41,6 +47,9 @@ class Artista:
 
     @staticmethod
     def where(data: dict):
+        """
+        Metodo para buscar artistas no banco de dados
+        """
         sql = "SELECT id, nome, foto FROM artista"
 
         if len(data.keys()) != 0:

@@ -6,6 +6,9 @@ from ..utils.encrypt import encrypt_password
 
 class LoginScreen(MDScreen):
     def login(self):
+        """
+        Realiza o login do usuário
+        """
         global usuario_logado
 
         email = self.ids.email.text
@@ -27,4 +30,7 @@ class LoginScreen(MDScreen):
                 self.manager.current = "home_screen"
 
     def sign_up(self):
+        """
+        Troca para a tela de cadastro
+        """
         self.manager.current = "sign_up_screen"

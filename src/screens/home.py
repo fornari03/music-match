@@ -24,17 +24,28 @@ class HomeScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.music_icons = {}
-        self.showing_users_connected = True
-        self.showing_evaluated_musics = True
+        self.showing_users_connected = False
+        self.showing_evaluated_musics = False
         self.showing_future_events = True
-
-    ############################## Tela de Início ##############################
 
     def on_pre_enter(self):
         """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
-        self.evaluated, self.not_evaluated = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
+        musicas = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
+        if not musicas:
+            self.dialog = MDDialog(text="Erro ao buscar as músicas do usuário.").open()
+            self.manager.current = "login_screen"
+            return
+        self.evaluated, self.not_evaluated = musicas
         self.connected = Usuario.get_connections(login.usuario_logado.id)
+        if not self.connected:
+            self.dialog = MDDialog(text="Erro ao buscar as conexões do usuário.").open()
+            self.manager.current = "login_screen"
+            return
         self.not_connected = Usuario.get_not_connections(login.usuario_logado.id)
+        if not self.not_connected:
+            self.dialog = MDDialog(text="Erro ao buscar as conexões do usuário.").open()
+            self.manager.current = "login_screen"
+            return
 
         # informacoes do perfil
         self.ids.nome.text = login.usuario_logado.nome
@@ -44,13 +55,18 @@ class HomeScreen(MDScreen):
         self.ids.senha.text = ""
         self.user_redes_sociais = Usuario.findSocialMedia(login.usuario_logado.id)
         if not self.user_redes_sociais:
-            self.dialog = MDDialog(text="Erro ao buscar as redes sociais do usuário.").open()
-        else:
-            for rede_social in self.user_redes_sociais:
-                self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
+            self.dialog = MDDialog(text="Erro ao buscar os dados do usuário.").open()
+            self.manager.current = "login_screen"
+            return
+        for rede_social in self.user_redes_sociais:
+            self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
 
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
         self.events = Evento.get_eventos(login.usuario_logado.id, self.connected)
+        if not self.events:
+            self.dialog = MDDialog(text="Erro ao buscar os eventos.").open()
+            self.manager.current = "login_screen"
+            return
 
         self.show_music_list()
 
@@ -58,7 +74,21 @@ class HomeScreen(MDScreen):
 
         self.show_events_grid()
 
+
+
+
+
+
+
+
+
+
+    ############################## Tela de Início ##############################
+
     def add_music_item(self, music):
+        """
+        Adiciona um item de música à lista de músicas.
+        """
         item = TwoLineAvatarIconListItem(text=f"{music['nome']} - {', '.join(music['estilo'])}", secondary_text=f"{', '.join(music['artista'])}")
         
         capa = ImageLeftWidget(source=music['capa'])
@@ -92,6 +122,9 @@ class HomeScreen(MDScreen):
 
 
     def like_music(self, like_icon, dislike_icon, music_id):
+        """
+        Altera o ícone de like e dislike da música de id music_id, dando like.
+        """
         if like_icon.icon == "thumb-up":
             like_icon.icon = "thumb-up-outline"
             self.changed_evaluation[music_id] = 'N'
@@ -101,6 +134,9 @@ class HomeScreen(MDScreen):
         dislike_icon.icon = "thumb-down-outline"
 
     def dislike_music(self, dislike_icon, like_icon, music_id):
+        """
+        Altera o ícone de like e dislike da música de id music_id, dando dislike.
+        """
         if dislike_icon.icon == "thumb-down":
             dislike_icon.icon = "thumb-down-outline"
             self.changed_evaluation[music_id] = 'N'
@@ -111,6 +147,9 @@ class HomeScreen(MDScreen):
 
 
     def show_music_list(self, search_string=None):
+        """
+        Mostra a lista de músicas na tela de início.
+        """
         self.ids.music_list.clear_widgets()
         if not self.showing_evaluated_musics:
             for music in self.not_evaluated:
@@ -123,10 +162,16 @@ class HomeScreen(MDScreen):
                     self.add_music_item(music)
 
     def switch_musics_view(self):
+        """
+        Troca a visualização entre músicas avaliadas e não avaliadas.	
+        """
         self.showing_evaluated_musics = not self.showing_evaluated_musics
         self.show_music_list()
 
     def show_musics_search(self):
+        """
+        Mostra a barra de pesquisa de músicas.
+        """
         self.dialog = MDDialog(
             title="Buscar Música",
             type="custom",
@@ -143,10 +188,16 @@ class HomeScreen(MDScreen):
         self.dialog.open()
 
     def search_music(self, search_string):
+        """
+        Faz a busca de músicas na lista de músicas.
+        """
         self.show_music_list(search_string)
         self.dialog.dismiss()
 
     def save_evaluations(self):
+        """
+        Salva as avaliações feitas pelo usuário.
+        """
         self.dialog = MDDialog(
             text="Salvar avaliações?",
             buttons=[
@@ -165,6 +216,9 @@ class HomeScreen(MDScreen):
         self.dialog.open()
 
     def confirm_save(self):
+        """
+        Confirma a ação de salvar as avaliações feitas pelo usuário.
+        """
         erro = False
         for music_id, evaluation in self.changed_evaluation.items():
             achou = False
@@ -195,8 +249,12 @@ class HomeScreen(MDScreen):
         if erro:
             self.dialog = MDDialog(text="Ocorreu um erro ao salvar uma ou mais operações.").open()
             
-        self.on_pre_enter()     # VERIFICAR SE FUNCIONA E FAZ SENTIDO
-        # TODO: bloquear a interface por um tempo até receber tudo do banco de dados de novo
+        self.on_pre_enter()
+
+
+
+
+
 
 
 
@@ -205,6 +263,9 @@ class HomeScreen(MDScreen):
     ############################## Tela de Eventos ##############################
 
     def add_event_banner(self, event):
+        """
+        Adiciona um banner de evento à lista de eventos.
+        """
         banner = MDCard(id=f"banner_{event['id']}", orientation="vertical", size_hint=(0.5, None), size=(350, 300), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300)
 
         grid_layout = MDGridLayout(cols=2, padding=[5, 10, 5, 10], spacing=10)
@@ -285,6 +346,9 @@ class HomeScreen(MDScreen):
         self.ids.events_grid.add_widget(banner)
 
     def mark_interest(self, banner, interest_button, interest_label):
+        """
+        Marca ou desmarca interesse no evento.
+        """
         if interest_button.text == "Tenho interesse":
             marca_interesse = Evento.addTemInteresse(login.usuario_logado.id, int(banner.id.split("_")[1]))
             if not marca_interesse:
@@ -327,6 +391,9 @@ class HomeScreen(MDScreen):
                     break
 
     def mark_presence(self, banner, interest_button, interest_label):
+        """
+        Marca ou desmarca presença no evento.
+        """
         if interest_button.text == "Marcar presença":
             marca_presenca = Evento.addParticipouDe(login.usuario_logado.id, int(banner.id.split("_")[1]))
             if not marca_presenca:
@@ -369,6 +436,9 @@ class HomeScreen(MDScreen):
                     break
 
     def show_events_grid(self, search_string=None):
+        """
+        Mostra a lista de eventos na tela de eventos.
+        """
         self.ids.events_grid.clear_widgets()
         if self.showing_future_events:
             for event in self.events:
@@ -382,10 +452,16 @@ class HomeScreen(MDScreen):
                         self.add_event_banner(event)
 
     def switch_events_view(self):
+        """
+        Troca a visualização entre eventos futuros e passados.
+        """
         self.showing_future_events = not self.showing_future_events
         self.show_events_grid()
 
     def show_events_search(self):
+        """
+        Mostra a barra de pesquisa de eventos.
+        """
         self.dialog = MDDialog(
             title="Buscar Evento",
             type="custom",
@@ -402,8 +478,16 @@ class HomeScreen(MDScreen):
         self.dialog.open()
 
     def search_event(self, search_string):
+        """
+        Faz a busca de eventos na lista de eventos.
+        """
         self.show_events_grid(search_string)
         self.dialog.dismiss()
+
+
+
+
+
 
 
 
@@ -412,13 +496,16 @@ class HomeScreen(MDScreen):
     ############################## Tela de Conexões ##############################
 
     def add_connection_banner(self, connection, status):
+        """
+        Adiciona um banner de conexão à lista de conexões.
+        """
         banner = MDCard(orientation="vertical", size_hint=(0.5, None), size=(300, 200), md_bg_color=(0.2, 0.22, 0.2, 1), radius=[15], padding=[10], spacing=300)
 
         box_layout = MDBoxLayout(orientation="vertical", padding=[10], spacing=10)
 
         box_layout.add_widget(MDLabel(text=connection['nome'], size_hint=(0.9, 0.1), bold=True))
 
-        box_layout.add_widget(MDLabel(text="    //    ".join([": ".join([rd, ru]) for rd, ru in connection['redes_sociais']]), size_hint=(0.9, 0.2)))
+        box_layout.add_widget(MDLabel(text="Redes:" + "    //    ".join([": ".join([rd, ru]) for rd, ru in connection['redes_sociais']]), size_hint=(0.9, 0.2)))
 
         box_layout.add_widget(MDLabel(text=f"Gosto musical: {', '.join([genero for genero in connection['musical_taste']])}", size_hint=(0.9, 0.1)))
 
@@ -440,6 +527,9 @@ class HomeScreen(MDScreen):
         self.ids.connections_grid.add_widget(banner)
 
     def remove_connection(self, banner):
+        """
+        Remove a conexão com o usuário do banner.
+        """
         for i in range(len(self.ids.connections_grid.children)-1, -1, -1):
             if self.ids.connections_grid.children[i] == banner:
                 self.dialog = MDDialog(
@@ -461,7 +551,9 @@ class HomeScreen(MDScreen):
                 break
 
     def confirm_disconect(self, idx):
-        """Método que apaga o MDCard da conexão com o usuário de índice idx no grid."""
+        """
+        Confirma a ação de desconectar do usuário de banner de índice idx.
+        """
         self.dialog.dismiss()
         i = len(self.connected) - idx - 1
         user = self.connected[i]
@@ -486,6 +578,9 @@ class HomeScreen(MDScreen):
         self.show_connections_grid()
 
     def add_connection(self, banner):
+        """
+        Adiciona a conexão com o usuário do banner.
+        """
         for i in range(len(self.ids.connections_grid.children)-1, -1, -1):
             if self.ids.connections_grid.children[i] == banner:
                 self.dialog = MDDialog(
@@ -507,7 +602,9 @@ class HomeScreen(MDScreen):
                 break
 
     def confirm_connect(self, idx):
-        """Método que adiciona o MDCard da conexão com o usuário de índice idx no grid."""
+        """
+        Confirma a ação de conectar com o usuário de banner de índice idx.
+        """
         self.dialog.dismiss()
         i = len(self.not_connected) - idx - 1
         user = self.not_connected[i]
@@ -533,6 +630,9 @@ class HomeScreen(MDScreen):
         self.show_connections_grid()
 
     def show_connections_grid(self, search_string=None):
+        """
+        Mostra a lista de conexões na tela de conexões.
+        """
         self.ids.connections_grid.clear_widgets()
         if self.showing_users_connected:
             for connection in self.connected:
@@ -544,10 +644,16 @@ class HomeScreen(MDScreen):
                     self.add_connection_banner(connection, "not_connected")
 
     def switch_users_view(self):
+        """
+        Troca a visualização entre usuários conectados e não conectados.
+        """
         self.showing_users_connected = not self.showing_users_connected
         self.show_connections_grid()
 
     def show_users_search(self):
+        """
+        Mostra a barra de pesquisa de usuários.
+        """
         self.dialog = MDDialog(
             title="Buscar Usuário",
             type="custom",
@@ -564,8 +670,16 @@ class HomeScreen(MDScreen):
         self.dialog.open()
 
     def search_user(self, search_string):
+        """
+        Busca usuários na lista de conexões.
+        """
         self.show_connections_grid(search_string)
         self.dialog.dismiss()
+
+
+
+
+
 
 
 
@@ -574,11 +688,17 @@ class HomeScreen(MDScreen):
     ############################## Tela de Perfil ##############################
 
     def show_date_picker(self):
+        """
+        Mostra o seletor de data para a data de nascimento.
+        """
         date_dialog = MDDatePicker()
         date_dialog.open()
         date_dialog.bind(on_save=self.on_save)
 
     def on_save(self, instance, value, date_range):
+        """
+        Salva a data de nascimento selecionada.
+        """
         self.ids.data_nascimento.text = value.strftime("%d/%m/%Y")
         try:
             self.data_nascimento = value
@@ -586,6 +706,9 @@ class HomeScreen(MDScreen):
             self.data_nascimento = None
 
     def save(self):
+        """
+        Salva as informações do perfil do usuário.
+        """
         if self.ids.nome.text.strip() == "" or self.ids.email.text.strip() == "" or self.ids.data_nascimento.text.strip() == "":
             self.dialog = MDDialog(text="Preencha o nome, email e data de nascimento atualizada.").open()
             return
@@ -613,6 +736,9 @@ class HomeScreen(MDScreen):
             self.confirm_save_perfil()
 
     def confirm_save_perfil(self):
+        """
+        Confirma a ação de salvar as informações do perfil do usuário.
+        """
         self.dialog.dismiss()
         
         nome = self.ids.nome.text.strip()
@@ -674,6 +800,9 @@ class HomeScreen(MDScreen):
         self.dialog = MDDialog(text="Dados atualizados com sucesso!").open()
 
     def delete_account(self):
+        """
+        Deleta a conta do usuário.
+        """
         self.dialog = MDDialog(
             text="Deseja excluir sua conta?",
             buttons=[
@@ -692,6 +821,9 @@ class HomeScreen(MDScreen):
         self.dialog.open()
 
     def confirm_delete(self):
+        """
+        Confirma a ação de deletar a conta do usuário.
+        """
         self.dialog.dismiss()
 
         if not Usuario.delete(login.usuario_logado.id):
@@ -711,9 +843,11 @@ class HomeScreen(MDScreen):
         self.dialog.open()
         self.ids.home_screen_bottom_nav.switch_tab("inicio")
         self.manager.current = "login_screen"
-        # TODO: implementar lógica de exclusão de conta com o API do backend
 
     def add_social_media_item(self, social_media: str, user_social_media: str="", checked: bool=False):
+        """
+        Adiciona um item de rede social à lista de redes sociais.
+        """
         new_item = OneLineIconListItem(on_press=lambda x: self.checkbox_selected(len(self.ids.lista_opcoes.children)))
 
         new_item.add_widget(MDCheckbox(size_hint_x=None, pos_hint={"center_y": 0.5}, active=checked))
