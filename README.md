@@ -18,4 +18,4 @@ O Music Match é um aplicativo com uma temática musical onde é possível estab
 
 ## Camada de persistência
 
-![Diagrama da camada de persistência](https://github.com/user-attachments/assets/044ca2e5-a309-4886-8b75-c21147392551)
+![Diagrama da camada de persistência](https://github.com/user-attachments/assets/28029151-cbee-48b3-bce7-0d530d8c24a0)
