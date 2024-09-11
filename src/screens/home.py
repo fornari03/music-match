@@ -31,18 +31,18 @@ class HomeScreen(MDScreen):
     def on_pre_enter(self):
         """Método de entrada da tela de início, chamado antes da tela ser exibida. Deve receber todas as informações que serão mostradas nas telas de início, eventos, conexões e perfil."""
         musicas = Musica.getEvaluatedAndNotEvaluatedMusics(login.usuario_logado.id)
-        if not musicas:
+        if musicas == False:
             self.dialog = MDDialog(text="Erro ao buscar as músicas do usuário.").open()
             self.manager.current = "login_screen"
             return
         self.evaluated, self.not_evaluated = musicas
         self.connected = Usuario.get_connections(login.usuario_logado.id)
-        if not self.connected:
+        if self.connected == False:
             self.dialog = MDDialog(text="Erro ao buscar as conexões do usuário.").open()
             self.manager.current = "login_screen"
             return
         self.not_connected = Usuario.get_not_connections(login.usuario_logado.id)
-        if not self.not_connected:
+        if self.not_connected == False:
             self.dialog = MDDialog(text="Erro ao buscar as conexões do usuário.").open()
             self.manager.current = "login_screen"
             return
@@ -54,7 +54,7 @@ class HomeScreen(MDScreen):
         self.data_nascimento = login.usuario_logado.data_nascimento
         self.ids.senha.text = ""
         self.user_redes_sociais = Usuario.findSocialMedia(login.usuario_logado.id)
-        if not self.user_redes_sociais:
+        if self.user_redes_sociais == False:
             self.dialog = MDDialog(text="Erro ao buscar os dados do usuário.").open()
             self.manager.current = "login_screen"
             return
@@ -63,7 +63,7 @@ class HomeScreen(MDScreen):
 
         self.changed_evaluation = {}       # dicionario de músicas que sofreram alteração na avaliação no formato id_musica: 'CHAR_AVALIACAO'
         self.events = Evento.get_eventos(login.usuario_logado.id, self.connected)
-        if not self.events:
+        if self.events == False:
             self.dialog = MDDialog(text="Erro ao buscar os eventos.").open()
             self.manager.current = "login_screen"
             return
@@ -533,7 +533,7 @@ class HomeScreen(MDScreen):
         for i in range(len(self.ids.connections_grid.children)-1, -1, -1):
             if self.ids.connections_grid.children[i] == banner:
                 self.dialog = MDDialog(
-                    text=f"Deseja se desconectar de {banner.children[0].children[4].text}?",
+                    text=f"Deseja se desconectar de {banner.children[0].children[5].text}?",
                     buttons=[
                         MDFlatButton(
                             text="Cancelar",
@@ -584,7 +584,7 @@ class HomeScreen(MDScreen):
         for i in range(len(self.ids.connections_grid.children)-1, -1, -1):
             if self.ids.connections_grid.children[i] == banner:
                 self.dialog = MDDialog(
-                    text=f"Deseja se conectar com {banner.children[0].children[4].text}?",
+                    text=f"Deseja se conectar com {banner.children[0].children[5].text}?",
                     buttons=[
                         MDFlatButton(
                             text="Cancelar",
@@ -732,7 +732,6 @@ class HomeScreen(MDScreen):
             self.dialog.open()
         else:
             self.dialog = MDDialog(text="Ocorreu um erro inesperado.")
-            self.confirm_save()
             self.confirm_save_perfil()
 
     def confirm_save_perfil(self):
@@ -753,7 +752,7 @@ class HomeScreen(MDScreen):
                     return
                 else:
                     if (rede_social[0], rede_social[1]) not in self.user_redes_sociais:
-                        if rede_social[1] in [rs[1] for rs in self.user_redes_sociais]:
+                        if rede_social[0] in [rs[0] for rs in self.user_redes_sociais]:
                             ret = Usuario.editSocialMediaUsername(login.usuario_logado.id, rede_social[0], rede_social[1])
                             if not ret:
                                 self.dialog = MDDialog(text="Erro ao salvar os dados no banco de dados.").open()
@@ -790,13 +789,16 @@ class HomeScreen(MDScreen):
 
         self.ids.lista_opcoes.clear_widgets()
         self.user_redes_sociais = Usuario.findSocialMedia(login.usuario_logado.id)
-        if not self.user_redes_sociais:
+        if self.user_redes_sociais == False:
             self.dialog = MDDialog(text="Erro ao buscar as redes sociais do usuário.").open()
         else:
             for rede_social in self.user_redes_sociais:
                 self.add_social_media_item(rede_social[0].capitalize(), rede_social[1], True)
 
         # nao precisa reescrever os campos pq eh literalmente o que ja ta escrito la
+        login.usuario_logado = Usuario.where({"id": login.usuario_logado.id})[0]
+        self.user_redes_sociais = Usuario.findSocialMedia(login.usuario_logado.id)
+
         self.dialog = MDDialog(text="Dados atualizados com sucesso!").open()
 
     def delete_account(self):

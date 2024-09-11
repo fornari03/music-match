@@ -178,7 +178,7 @@ class Usuario:
         if user == False:
             return False
 
-        sql = f"UPDATE redes_sociais SET usuario_rede_social={userSocMed} WHERE id_usuario={id} AND rede_social='{socMed}'"
+        sql = f"UPDATE redes_sociais SET usuario_rede_social='{userSocMed}' WHERE id_usuario={id} AND rede_social='{socMed}'"
         if DBConnection.query(sql, False) == -1:
             return False
         return True
