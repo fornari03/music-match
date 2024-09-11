@@ -1,4 +1,6 @@
 **/__pycache__/
 *.pyc
 *.pyo
-images/*
+*.jpg
+*.png
+*.jpeg
